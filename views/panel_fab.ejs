@@ -1,0 +1,103 @@
+<!-- Linkage generation panel
+updated by yunwoo jeong -->
+<!-- yw_edited -->
+
+<div class="msketch-panel-container" id="panel_fab" style="display: none">
+    <div class="msketch-panel-title">Fabrication</div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-desc">Generate the 3D links and gears. Use 'Edit Link' tool to select a link</div>
+    </div>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-desc" style="font-weight: 700">3D Link Generation</div>
+      <label class="form-switch">
+        <input type="checkbox" id="panel_fab_Show3DLink">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">Show 3D Link</span>
+      </label>
+    </div>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-btn-text">Stacking Order</div>
+      <button class="msketch-panel-btn" id="btn_stackPlus"><i class="material-icons">add_circle_outline</i></button>
+      <button class="msketch-panel-btn" id="btn_stackMinus"><i class="material-icons">remove_circle_outline</i></button>
+    </div>
+    <button class="msketch-panel-btn-large" id="panel_fab_downloadLink"><i class="material-icons">file_download</i>Download Links (OBJ)</button>
+    <hr>
+
+    <div class="msketch-panel-desc" style="font-weight: 700">Gear Generation</div>
+    <div class="msketch-panel-row">
+        <button class="msketch-panel-btn-large" id="panel_fab_generateGear" style="width: 47%; display:inline-block; float: left"><i class="material-icons">done</i>Generate</button>
+        <button class="msketch-panel-btn-large" id="panel_fab_removeGear" style="width: 47%; display:inline-block; float: right"><i class="material-icons">remove</i>Remove</button>
+    </div>
+    <button class="msketch-panel-btn-large" id="panel_fab_downloadGear"><i class="material-icons">file_download</i>Download Gears (OBJ)</button>
+
+</div>
+
+
+<script>
+$('#panel_fab_Show3DLink').on('change', function(){
+    show3Dlinks( $(this).prop('checked') );
+})
+
+$('#btn_stackPlus').click(function(){
+  if(selectedLink==null) return false;
+    var _link = currentAssemblyGroup.findObjectFromElement(selectedLink);
+    if(_link != null){
+        selectedLink.stack++;
+        _link.updateStack();
+    }
+});
+
+$('#btn_stackMinus').click(function(){
+  if(selectedLink==null) return false;
+    var _link = currentAssemblyGroup.findObjectFromElement(selectedLink);
+    if(_link != null){
+        selectedLink.stack--;
+        _link.updateStack();
+    }
+});
+
+$('#panel_fab_downloadLink').click(function(){
+  var exporter = new THREE.OBJExporter();
+  for(var i in currentAssemblyGroup.objectList){
+      if(currentAssemblyGroup.objectList[i] instanceof Link3D){
+        var _mesh = currentAssemblyGroup.objectList[i].link3DObject
+        _mesh.geometry.scale(SCALE_TRANS, SCALE_TRANS, SCALE_TRANS);
+        var result = exporter.parse( _mesh );
+        _mesh.geometry.scale(1/SCALE_TRANS, 1/SCALE_TRANS, 1/SCALE_TRANS);
+
+        saveAsText('mSketchLink'+i+'.obj', result);
+      }
+  }
+});
+
+$('#panel_fab_generateGear').click(function(){
+  currentAssemblyGroup.makeGear();
+});
+
+$('#panel_fab_removeGear').click(function(){
+  currentAssemblyGroup.removeGear();
+});
+
+$('#panel_fab_downloadGear').click(function(){
+  var exporter = new THREE.OBJExporter();
+  for(var i in currentAssemblyGroup.gearObjList){
+      if(currentAssemblyGroup.gearObjList[i] instanceof Gear3D){
+          var _mesh = currentAssemblyGroup.gearObjList[i].gearObject;
+          _mesh.geometry.scale(SCALE_TRANS, SCALE_TRANS, SCALE_TRANS);
+          var result = exporter.parse( _mesh );
+          _mesh.geometry.scale(1/SCALE_TRANS, 1/SCALE_TRANS, 1/SCALE_TRANS);
+
+          saveAsText('mSketchGear'+i+'.obj', result);
+      }
+  }
+});
+
+function show3Dlinks(_flag){
+    Link3D.SHOW_3D = _flag;
+
+    for(var i in AssemblyGroupList){
+        AssemblyGroupList[i].updateRender();
+        AssemblyGroupList[i].update();
+    }
+}
+
+</script>

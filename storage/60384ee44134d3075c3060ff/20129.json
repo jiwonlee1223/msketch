@@ -1,0 +1,165 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 5,
+	"holeSize": 4,
+	"linkWidth": 12.7,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "-29.96",
+						"y": "0.87",
+						"z": "0.00"
+					},
+					{
+						"x": "6.93",
+						"y": "-0.12",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link16",
+					"points": [
+						{
+							"x": "-29.96",
+							"y": "0.87",
+							"z": "0.00"
+						},
+						{
+							"x": "-24.51",
+							"y": "12.75",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link17",
+					"points": [
+						{
+							"x": "6.93",
+							"y": "-0.12",
+							"z": "0.00"
+						},
+						{
+							"x": "7.18",
+							"y": "22.16",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link18",
+					"points": [
+						{
+							"x": "7.18",
+							"y": "22.16",
+							"z": "0.00"
+						},
+						{
+							"x": "-24.51",
+							"y": "12.75",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint17",
+					"points": [
+						{
+							"targetLink": "Link16",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint18",
+					"points": [
+						{
+							"targetLink": "Link17",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint19",
+					"points": [
+						{
+							"targetLink": "Link18",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link17",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint20",
+					"points": [
+						{
+							"targetLink": "Link16",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link18",
+							"targetIndex": 1
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [
+				{
+					"targetLink": "Link16",
+					"targetIndex": 1
+				},
+				{
+					"targetLink": "Link17",
+					"targetIndex": 1
+				}
+			],
+			"motors": [
+				{
+					"name": "Motor10",
+					"targetConstraint": "CoaxialConstraint17",
+					"targetLink1": "Link16",
+					"targetLink2": "Anchor",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 0,
+					"range": "0-180"
+				}
+			]
+		}
+	]
+}

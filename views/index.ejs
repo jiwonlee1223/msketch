@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+    <%- include("header") -%>
+</head>
+<body>
+
+
+    <div class="msketch-titlebar">
+    <button class="msketch-titlebar-btn" id="msketch_drawer_open"><i class="material-icons">menu</i></button>
+        <span class="msketch-logo">M.SKETCH</span>
+
+        <div class="msketch-titlebar-container">
+            <button class="msketch-titlebar-btn" id="btn_play" onclick="interfaceSelect(TOOL_RUN);" data-tooltip="Run"><i class="material-icons">play_arrow</i></button>
+            <button class="msketch-titlebar-btn" id="btn_save" onclick="showDialog(TOOL_SAVE)" data-tooltip="Save"><i class="material-icons">save</i></button>
+            <input id="msketch-titlebar-filename" value="Untitled Sketch"></input>
+        </div>
+
+
+        <div class="msketch-titlebar-username"><i class="material-icons">person_pin</i><%= user.name %></div>
+
+    </div>
+    <div class="msketch-toolbar">
+        <div class="msketch-toolbar-container" id="msketch_toolbar">
+            <div class="msketch-toolbar-text">Drawing</div>
+            <button class="msketch-toolbar-btn" id="btn_link" onclick="interfaceSelect(TOOL_LINK);" data-tooltip="Add Link"><img src="./public/res/icons/btnLink.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_ja" onclick="interfaceSelect(TOOL_JA);" data-tooltip="Add Motor"><img src="./public/res/icons/btnJA.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_slider" onclick="interfaceSelect(TOOL_SLIDER);" data-tooltip="Set Slider"><img src="./public/res/icons/btnSlider.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_mark" onclick="interfaceSelect(TOOL_MARK);" data-tooltip="Toggle Marker"><img src="./public/res/icons/btnMark.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_move" onclick="interfaceSelect(TOOL_MOVE);" data-tooltip="Edit Link"><img src="./public/res/icons/btnMove.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_remove" onclick="interfaceSelect(TOOL_REMOVE);" data-tooltip="Remove Part"><i class="material-icons">delete_forever</i></button>
+            <div class="msketch-toolbar-spacer">|</div>
+            <div class="msketch-toolbar-text">Navigation</div>
+            <button class="msketch-toolbar-btn" id="btn_nav" onclick="interfaceSelect(TOOL_NAV);" data-tooltip="Toggle View Tumbling"><i class="material-icons">3d_rotation</i></button>
+            <button class="msketch-toolbar-btn" id="btn_pcam" onclick="interfaceSelect(TOOL_PCAM);" data-tooltip="See Plane on Top"><i class="material-icons">fullscreen</i></button>
+            <button class="msketch-toolbar-btn" id="btn_pcam" onclick="setViewMode(0);" data-tooltip="Schematic View"><img src="./public/res/icons/btnSchematicView.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_pcam" onclick="setViewMode(1);" data-tooltip="Part View"><img src="./public/res/icons/btnPartsView.png"></button>
+            <div class="msketch-toolbar-spacer">|</div>
+            <div class="msketch-toolbar-text">History</div>
+            <button class="msketch-toolbar-btn" id="btn_nav" onclick="undo();" data-tooltip="Undo"><i class="material-icons">chevron_left</i></button>
+            <button class="msketch-toolbar-btn" id="btn_pcam" onclick="redo();" data-tooltip="Redo"><i class="material-icons">chevron_right</i></button>
+            <div class="msketch-toolbar-spacer">|</div>
+            <div class="msketch-toolbar-text">Plane</div>
+            <button class="msketch-toolbar-btn" id="btn_padd" onclick="interfaceSelect(TOOL_PADD);" data-tooltip="Add Plane"><img src="./public/res/icons/btnPAdd.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_premove" onclick="showDialog(TOOL_PREMOVE);" data-tooltip="Remove Plane"><img src="./public/res/icons/btnPRemove.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_psel" onclick="interfaceSelect(TOOL_PSEL);" data-tooltip="Select Plane"><img src="./public/res/icons/btnPSel.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_ptrans" onclick="interfaceSelect(TOOL_PTRANS);" data-tooltip="Plane Translation"><img src="./public/res/icons/btnPTrans.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_prot" onclick="interfaceSelect(TOOL_PROT);" data-tooltip="Plane Rotation"><img src="./public/res/icons/btnPRot.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_prot" onclick="interfaceSelect(TOOL_PCOPY);" data-tooltip="Copy This Plane"><img src="./public/res/icons/btnPCopy.png"></button>
+        </div>
+
+    </div>
+
+    <div class="msketch-drawer" id="msketch_drawer">
+        <button class="msketch-drawer-btn" onclick="showDialog(TOOL_NEWFILE);"><i class="material-icons">insert_drive_file</i>New</button>
+        <button class="msketch-drawer-btn" onclick="showDialog(TOOL_SAVE);"><i class="material-icons">save</i>Save</button>
+        <button class="msketch-drawer-btn" onclick="showDialog(TOOL_OPEN);"><i class="material-icons">folder_open</i>Open</button>
+        <button class="msketch-drawer-btn" onclick="interfaceSelect(TOOL_EXPORT);"><i class="material-icons">file_download</i>Export Plane</button>
+        <button class="msketch-drawer-btn" onclick="showDialog(TOOL_IMPORT);"><i class="material-icons">file_upload</i>Import Plane</button>
+        <button class="msketch-drawer-btn" onclick="interfaceSelect(TOOL_DRAWING);"><i class="material-icons">picture_as_pdf</i>Export Drawing</button>
+        <button class="msketch-drawer-btn" onclick="location.href='logout';"><i class="material-icons">cloud_off</i>Logout</button>
+        <button class="msketch-drawer-btn" onclick="$('#msketch_about').show();"><i class="material-icons">info_outline</i>About</button>
+    </div>
+
+    <%- include("panels") -%>
+
+    <div id="threejs_canvas"></div>
+
+    <div class="msketch-message" id="msketch_message"></div>
+
+    <script>
+        function showMessage(_msg){
+            $('#msketch_message').text(_msg);
+            //$('#msketch_message').animate({bottom: "0"}, 300)
+            $('#msketch_message').css('bottom', 0);
+
+            setTimeout(function(){
+                $('#msketch_message').css('bottom', '-48px');
+            },2000);
+        }
+    </script>
+
+
+    <%- include("dialogs") -%>
+    <%- include("about") -%>
+    <%- include("scripts") -%>
+
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 5,
+	"holeSize": 4,
+	"linkWidth": 12.7,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "85.77",
+						"y": "45.41",
+						"z": "0.00"
+					},
+					{
+						"x": "256.28",
+						"y": "-50.03",
+						"z": "0.00"
+					},
+					{
+						"x": "75.88",
+						"y": "-118.11",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link65*",
+					"points": [
+						{
+							"x": "85.77",
+							"y": "45.41",
+							"z": "0.00"
+						},
+						{
+							"x": "-14.13",
+							"y": "127.35",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link66*",
+					"points": [
+						{
+							"x": "-14.13",
+							"y": "127.35",
+							"z": "0.00"
+						},
+						{
+							"x": "-122.74",
+							"y": "-136.67",
+							"z": "0.00"
+						},
+						{
+							"x": "-72.51",
+							"y": "-57.01",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link67*",
+					"points": [
+						{
+							"x": "-72.51",
+							"y": "-57.01",
+							"z": "0.00"
+						},
+						{
+							"x": "212.10",
+							"y": "11.17",
+							"z": "0.00"
+						},
+						{
+							"x": "32.32",
+							"y": "-49.62",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link69*",
+					"points": [
+						{
+							"x": "256.28",
+							"y": "-50.03",
+							"z": "0.00"
+						},
+						{
+							"x": "212.10",
+							"y": "11.17",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link70*",
+					"points": [
+						{
+							"x": "75.88",
+							"y": "-118.11",
+							"z": "0.00"
+						},
+						{
+							"x": "32.32",
+							"y": "-49.62",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint85*",
+					"points": [
+						{
+							"targetLink": "Link65*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint86*",
+					"points": [
+						{
+							"targetLink": "Link66*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link65*",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint87*",
+					"points": [
+						{
+							"targetLink": "Link67*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link66*",
+							"targetIndex": 2
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint89*",
+					"points": [
+						{
+							"targetLink": "Link69*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint90*",
+					"points": [
+						{
+							"targetLink": "Link67*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link69*",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint91*",
+					"points": [
+						{
+							"targetLink": "Link70*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 2
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint92*",
+					"points": [
+						{
+							"targetLink": "Link67*",
+							"targetIndex": 2
+						},
+						{
+							"targetLink": "Link70*",
+							"targetIndex": 1
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [
+				{
+					"targetLink": "Link66*",
+					"targetIndex": 1
+				}
+			],
+			"motors": [
+				{
+					"name": "Motor10",
+					"targetConstraint": "CoaxialConstraint89*",
+					"targetLink1": "Link69*",
+					"targetLink2": "Anchor",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 0,
+					"range": "0-180"
+				}
+			]
+		}
+	]
+}

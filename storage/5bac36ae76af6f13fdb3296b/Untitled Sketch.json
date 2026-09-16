@@ -1,0 +1,143 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 5,
+	"holeSize": 4,
+	"linkWidth": 12.7,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "-6.65"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "-82.31",
+						"y": "1.37",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link130",
+					"points": [
+						{
+							"x": "-82.31",
+							"y": "1.37",
+							"z": "0.00"
+						},
+						{
+							"x": "-8.59",
+							"y": "109.41",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link131",
+					"points": [
+						{
+							"x": "-8.59",
+							"y": "109.41",
+							"z": "0.00"
+						},
+						{
+							"x": "262.78",
+							"y": "200.29",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link132",
+					"points": [
+						{
+							"x": "262.78",
+							"y": "200.29",
+							"z": "0.00"
+						},
+						{
+							"x": "316.80",
+							"y": "8.36",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint197",
+					"points": [
+						{
+							"targetLink": "Link130",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint198",
+					"points": [
+						{
+							"targetLink": "Link131",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link130",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint199",
+					"points": [
+						{
+							"targetLink": "Link132",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link131",
+							"targetIndex": 1
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [
+				{
+					"targetLink": "Link131",
+					"targetIndex": 1
+				}
+			],
+			"motors": [
+				{
+					"name": "Motor27",
+					"targetConstraint": "CoaxialConstraint197",
+					"targetLink1": "Link130",
+					"targetLink2": "Anchor",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 0,
+					"range": "0-180"
+				}
+			]
+		}
+	]
+}

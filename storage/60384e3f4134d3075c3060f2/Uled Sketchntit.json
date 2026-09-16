@@ -1,0 +1,126 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 5,
+	"holeSize": 4,
+	"linkWidth": 12.7,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "-55.62",
+						"y": "61.89",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link13",
+					"points": [
+						{
+							"x": "-55.62",
+							"y": "61.89",
+							"z": "0.00"
+						},
+						{
+							"x": "-77.55",
+							"y": "26.48",
+							"z": "0.00"
+						},
+						{
+							"x": "-93.22",
+							"y": "53.43",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link14",
+					"points": [
+						{
+							"x": "-55.62",
+							"y": "61.89",
+							"z": "0.00"
+						},
+						{
+							"x": "-93.22",
+							"y": "53.43",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link16",
+					"points": [
+						{
+							"x": "-93.22",
+							"y": "53.43",
+							"z": "0.00"
+						},
+						{
+							"x": "-101.68",
+							"y": "17.39",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint17",
+					"points": [
+						{
+							"targetLink": "Link14",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link13",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint21",
+					"points": [
+						{
+							"targetLink": "Link16",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link13",
+							"targetIndex": 2
+						},
+						{
+							"targetLink": "Link14",
+							"targetIndex": 1
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [],
+			"motors": []
+		}
+	]
+}

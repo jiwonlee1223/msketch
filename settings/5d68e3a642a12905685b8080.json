@@ -1,0 +1,11 @@
+{
+	"showGrid": false,
+	"showText": true,
+	"showPlane": false,
+	"gridGap": 10,
+	"planeSize": 100,
+	"linkWidth": 6,
+	"holeDiameter": 4,
+	"linkThickness": 4,
+	"MaxHistorySize": 30
+}

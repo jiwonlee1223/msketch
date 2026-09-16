@@ -1,0 +1,123 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "-40.75",
+						"y": "-11.78",
+						"z": "0.00"
+					},
+					{
+						"x": "27.47",
+						"y": "-27.20",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link1",
+					"points": [
+						{
+							"x": "-40.75",
+							"y": "-11.78",
+							"z": "0.00"
+						},
+						{
+							"x": "-29.06",
+							"y": "45.63",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link2",
+					"points": [
+						{
+							"x": "27.47",
+							"y": "-27.20",
+							"z": "0.00"
+						},
+						{
+							"x": "10.63",
+							"y": "52.54",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint1",
+					"points": [
+						{
+							"targetLink": "Link1",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint2",
+					"points": [
+						{
+							"targetLink": "Link2",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 1
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [],
+			"motors": [
+				{
+					"name": "Motor1",
+					"targetConstraint": "CoaxialConstraint1",
+					"targetLink1": "Link1",
+					"targetLink2": "Anchor",
+					"type": "DC",
+					"direction": 1,
+					"speed": 42,
+					"phase": 34,
+					"range": "123-180"
+				},
+				{
+					"name": "Motor2",
+					"targetConstraint": "CoaxialConstraint2",
+					"targetLink1": "Link2",
+					"targetLink2": "Anchor",
+					"type": "SERVO",
+					"direction": 0,
+					"speed": 67,
+					"phase": 11,
+					"range": "0-300"
+				}
+			]
+		}
+	]
+}

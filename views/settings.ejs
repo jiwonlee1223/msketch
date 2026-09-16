@@ -1,0 +1,136 @@
+<div class="msketch-panel-container" id="panel_settings" style="display: none">
+    <div class="msketch-panel-title">Settings</div>
+
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-desc" style="font-weight: 700">View</div>
+      <label class="form-switch">
+        <input type="checkbox" id="setting_showGrid">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">Show Grid</span>
+      </label>
+      <label class="form-switch">
+        <input type="checkbox" id="setting_showText">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">Show Length Text</span>
+      </label>
+      <label class="form-switch">
+        <input type="checkbox" id="setting_showPlane">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">Show Plane</span>
+      </label>
+    </div>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-label" data-label="Grid Gap (mm)" style="width: 49%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_gridGap">
+      </div>
+      <div class="msketch-panel-label" data-label="Plane Size (mm)" style="width: 49%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_planeSize">
+      </div>
+    </div>
+    <hr>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-desc" style="font-weight: 700">Part</div>
+    </div>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-label" data-label="Hole Dia. (mm)" style="width: 100%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_holeDiameter">
+      </div>
+    </div>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-label" data-label="Link Width (mm)" style="width: 49%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_linkWidth">
+      </div>
+      <div class="msketch-panel-label" data-label="Link Thickness (mm)" style="width: 49%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_linkThickness">
+      </div>
+    </div>
+    <hr>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-desc" style="font-weight: 700">System</div>
+    </div>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-label" data-label="Max History Size" style="width: 100%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_maxHistory">
+      </div>
+    </div>
+
+    <button class="msketch-panel-btn-large" id="setting_apply"><i class="material-icons">done</i>Apply</button>
+</div>
+
+<script>
+
+    $('#setting_apply').click( function(){
+        applySettings();
+    });
+
+    function loadSettings(){
+        $('#setting_showGrid').prop('checked', msketchSettings.showGrid);
+        $('#setting_showText').prop('checked', msketchSettings.showText);
+        $('#setting_showPlane').prop('checked', msketchSettings.showPlane);
+
+        $('#setting_gridGap').val( msketchSettings.gridGap );
+        $('#setting_planeSize').val( msketchSettings.planeSize );
+
+        $('#setting_holeDiameter').val( msketchSettings.holeDiameter );
+        $('#setting_linkWidth').val( msketchSettings.linkWidth );
+        $('#setting_linkThickness').val( msketchSettings.linkThickness );
+
+        $('#setting_maxHistory').val( msketchSettings.MaxHistorySize );
+    }
+
+    function initSettings(){
+        $.ajax({
+            url: '/loadSettings',
+            method: 'post',
+            success: function (data) {
+                msketchSettings = JSON.parse(data.settings);
+
+                // apply settings
+                MAX_HISTORY = parseInt( msketchSettings.MaxHistorySize );
+
+                for(var i=0; i<AssemblyGroupList.length; i++){
+                    AssemblyGroupList[i].setSettings(msketchSettings);
+            		AssemblyGroupList[i].needsUpdate = true;
+            		AssemblyGroupList[i].load();
+            	}
+            },
+            error: function (err) {
+                showMessage("Setting Load failed");
+            }
+        });
+    }
+
+    function applySettings(){
+        msketchSettings.showGrid = $("#setting_showGrid").prop("checked");
+        msketchSettings.showText = $("#setting_showText").prop("checked");
+        msketchSettings.showPlane = $("#setting_showPlane").prop("checked");
+
+        msketchSettings.gridGap = parseFloat( $('#setting_gridGap').val() );
+        msketchSettings.planeSize = parseFloat( $('#setting_planeSize').val() );
+
+        msketchSettings.holeDiameter = parseFloat( $('#setting_holeDiameter').val() );
+        msketchSettings.linkWidth = parseFloat( $('#setting_linkWidth').val() );
+        msketchSettings.linkThickness = parseFloat( $('#setting_linkThickness').val() );
+
+        //apply setting to 3D link (yw_edited)
+        Link3D.HEIGHT = msketchSettings.linkThickness;
+        Link3D.EXTRUDE_SET.amount = msketchSettings.linkThickness;
+        Link3D.HOLE_SIZE = (msketchSettings.holeDiameter/SCALE_TRANS)/2;
+
+        msketchSettings.MaxHistorySize = parseInt( $('#setting_maxHistory').val() );
+
+        $.ajax({
+            url: '/saveSettings',
+            method: 'post',
+            data: {
+                settings: JSON.stringify(msketchSettings, null, '\t')
+            },
+            success: function (data) {
+                showMessage("Setting was applied.");
+                initSettings();
+            },
+            error: function (err) {
+                showMessage("Setting save failed");
+            }
+        });
+
+    }
+
+</script>

@@ -1,0 +1,272 @@
+<div class="msketch-panel-container" id="panel_motor" style="display: none">
+    <div class="msketch-panel-title">Motor<br>Setting</div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="Unit Speed (deg/s)" style="width: 100%; vertical-align: bottom">
+            <input class="form-input msketch-panel-input" type="text" id="motor_gspeed_txt" value="180" style="width: 20%;">
+            <input class="slider msketch-panel-slider" type="range" id="motor_gspeed_slider" min="0" max="720" value="180" style="width: 70%;"/>
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="Motor List" style="width: 100%;">
+            <select id="motor_list" class="form-select msketch-panel-select">
+            </select>
+        </div>
+    </div>
+    <hr>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label motor-both disableClick" data-label="Motor Type" style="width: 100%; vertical-align: bottom">
+            <label class="form-radio" style="width: 49%;">
+              <input type="radio" name="gender" id="motor_type_dc" checked>
+              <i class="form-icon"></i> <span class="msketch-panel-desc">DC Motor</span>
+            </label>
+            <label class="form-radio" style="width: 49%;">
+              <input type="radio" name="gender" id="motor_type_servo" >
+              <i class="form-icon"></i> <span class="msketch-panel-desc">Servo Motor</span>
+            </label>
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label motor-both disableClick" data-label="Motor Phase (deg)" style="width: 100%; vertical-align: bottom">
+            <input class="form-input msketch-panel-input" type="text" id="motor_phase_txt" style="width: 20%;">
+            <input class="slider msketch-panel-slider" type="range" id="motor_phase_slider" min="0" max="360" value="0" style="width: 70%;"/>
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label motor-both disableClick" data-label="Speed Multiply (%)" style="width: 100%; vertical-align: bottom">
+            <input class="form-input msketch-panel-input" type="text" id="motor_speed_txt" style="width: 20%;">
+            <input class="slider msketch-panel-slider" type="range" id="motor_speed_slider" min="0" max="400" value="100" style="width: 70%;"/>
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label motor-servo disableClick" data-label="Min Angle (deg)" style="width: 100%; vertical-align: bottom">
+            <input class="form-input msketch-panel-input" type="text" id="motor_min_txt" style="width: 20%;">
+            <input class="slider msketch-panel-slider" type="range" id="motor_min_slider" min="0" max="360" value="0" style="width: 70%;"/>
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label motor-servo disableClick" data-label="Max Angle (deg)" style="width: 100%; vertical-align: bottom">
+            <input class="form-input msketch-panel-input" type="text" id="motor_max_txt" style="width: 20%;">
+            <input class="slider msketch-panel-slider" type="range" id="motor_max_slider" min="0" max="360" value="180" style="width: 70%;"/>
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+      <label class="form-switch motor-dc disableClick">
+        <input type="checkbox" id="motor_reverse">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">Reverse Direction</span>
+      </label>
+    </div>
+</div>
+
+<style>
+.msketch-panel-slider{
+    display:inline-block;
+    margin-left: 12px;
+    vertical-align: middle;
+}
+.msketch-panel-input{
+    vertical-align: middle;
+}
+</style>
+
+<script>
+    $('#motor_gspeed_txt').on('change', function(){
+        motorSpeed = Math.radians( parseInt( $(this).val() ) );
+        $('#motor_gspeed_slider').val( $(this).val() );
+    });
+    $('#motor_gspeed_slider').on('input change', function(){
+        motorSpeed = Math.radians( parseInt( $(this).val() ) );
+        $('#motor_gspeed_txt').val( $(this).val() );
+    });
+
+    $('#motor_list').on('mousedown', function(){
+        updateMotorList();
+    });
+
+    $('#motor_list').on('change', function(){
+        updateMotorInfo();
+    });
+
+    $('#motor_type_dc').on('change', function(){
+        if($(this).prop('checked')){
+            pointedActuator.setDC();
+            updateMotorInfo();
+            try360forAssemblies();
+        }
+    });
+    $('#motor_type_servo').on('change', function(){
+        if($(this).prop('checked')){
+            pointedActuator.setServo();
+            updateMotorInfo();
+            try360forAssemblies();
+        }
+    });
+
+    $('#motor_phase_txt').on('change', function(){
+        pointedActuator.setPhase(Math.radians(parseInt($(this).val())));
+        if(pointedActuator.isServo) applyActuator(pointedActuator, parseInt( $(this).val() ) + parseInt( $("#motor_min_txt").val() ));
+        else applyActuator(pointedActuator, $(this).val());
+        $('#motor_phase_slider').val( $(this).val() );
+    });
+    $('#motor_phase_slider').on('input change', function(){
+        pointedActuator.setPhase(Math.radians(parseInt($(this).val())));
+        if(pointedActuator.isServo) applyActuator(pointedActuator, parseInt( $(this).val() ) + parseInt( $("#motor_min_txt").val() ));
+        else applyActuator(pointedActuator, $(this).val());
+        $('#motor_phase_txt').val( $(this).val() );
+    });
+
+    $('#motor_speed_txt').on('change', function(){
+        pointedActuator.setSpeedMultiply(parseInt( $(this).val() ) / 100);
+        $('#motor_speed_slider').val( $(this).val() );
+    });
+    $('#motor_speed_slider').on('input change', function(){
+        pointedActuator.setSpeedMultiply(parseInt( $(this).val() ) / 100);
+        $('#motor_speed_txt').val( $(this).val() );
+    });
+
+    $('#motor_min_txt').on('change', function(){
+        pointedActuator.setStartAngle(Math.radians(parseInt( $(this).val() )));
+        applyActuator(pointedActuator, parseInt( $(this).val() ) + parseInt( $("#motor_phase_txt").val() ));
+        $('#motor_min_slider').val( $(this).val() );
+    });
+    $('#motor_min_slider').on('input change', function(){
+        pointedActuator.setStartAngle(Math.radians(parseInt( $(this).val() )));
+        applyActuator(pointedActuator, parseInt( $(this).val() ) + parseInt( $("#motor_phase_txt").val() ));
+        $('#motor_min_txt').val( $(this).val() );
+    });
+
+    $('#motor_max_txt').on('change', function(){
+        pointedActuator.setEndAngle(Math.radians(parseInt( $(this).val() )));
+        applyActuator(pointedActuator, parseInt( $("#motor_min_txt").val() ) + parseInt( $("#motor_phase_txt").val() ));
+        $('#motor_max_slider').val( $(this).val() );
+    });
+    $('#motor_max_slider').on('input change', function(){
+        pointedActuator.setEndAngle(Math.radians(parseInt( $(this).val() )));
+        applyActuator(pointedActuator, parseInt( $("#motor_min_txt").val() ) + parseInt( $("#motor_phase_txt").val() ));
+        $('#motor_max_txt').val( $(this).val() );
+    });
+
+
+    $('#motor_reverse').on('change', function(){
+        pointedActuator.setReverse( $(this).prop('checked') );
+    })
+
+
+    function updateMotorList(){
+        $('#motor_list').empty();
+        $.each(getActuatorName(), function (i, item) {
+            $('#motor_list').append($('<option>', {
+                value: i,
+                text : item
+            }));
+        });
+        $('#motor_list').val(null);
+
+        $('.motor-both').addClass('disableClick');
+        $('.motor-servo').addClass('disableClick');
+        $('.motor-dc').addClass('disableClick');
+    }
+
+    function updateMotorInfo(){
+        var a = null;
+        var _motorType = 0;
+
+        var _selectedIndex = parseInt( $('#motor_list').val() );
+
+
+        if (_selectedIndex != -1) {
+            a = findJAfromName( $('#motor_list option:selected').text() );
+        }
+
+        if (a == null) {
+            showMessage("Motor not found.")
+            // close other panel
+            return;
+        } else {
+            if (!a.isServo) _motorType = 0;
+            else _motorType = 1;
+            pointedActuator = a;
+        }
+
+        // 모터 선택 보이기
+        $('.motor-both').removeClass('disableClick');
+
+        // get motor type
+        if(_motorType == 0){
+            $('#motor_type_dc').prop('checked', true);
+            $('#motor_type_servo').prop('checked', false);
+            $('.motor-servo').addClass('disableClick')
+            $('.motor-dc').removeClass('disableClick');
+        }else{
+            $('#motor_type_dc').prop('checked', false);
+            $('#motor_type_servo').prop('checked', true);
+            $('.motor-dc').addClass('disableClick')
+            $('.motor-servo').removeClass('disableClick');
+        }
+
+        $('#motor_phase_txt').val( Math.round(Math.degrees(a.getPhase())) );
+        $('#motor_speed_txt').val( Math.round(a.getSpeedMultiply() * 100) );
+        $('#motor_min_txt').val( Math.round(Math.degrees(a.getStartAngle())) );
+        $('#motor_max_txt').val( Math.round(Math.degrees(a.getEndAngle())) );
+
+        if(a.getReverse()) $('#motor_reverse').prop('checked', true);
+        else $('#motor_reverse').prop('checked', false);
+
+        $('#motor_phase_slider').val( $('#motor_phase_txt').val() );
+        $('#motor_speed_slider').val( $('#motor_speed_txt').val() );
+        $('#motor_min_slider').val( $('#motor_min_txt').val() );
+        $('#motor_max_slider').val( $('#motor_max_txt').val() );
+    }
+
+    function getActuatorName() {
+        var returnValue = [];
+
+        for (i = 0; i < AssemblyGroupList.length; i++) {
+            var _actuatorList = AssemblyGroupList[i].assembly.getAllActuator();
+
+            if (_actuatorList != null) {
+                for (var ai in _actuatorList.array) {
+                    var a = _actuatorList.get(ai);
+                    if (a instanceof JointActuator) {
+                        returnValue.push(a.getName() + " on Plane" + i);
+                    }
+                }
+            }
+        }
+
+        return returnValue;
+    }
+
+    function findJAfromName(_fullName) {
+        if (_fullName == '' || _fullName == null) return null;
+
+        _name = _fullName.split(" on Plane")[0]
+        _index = parseInt(_fullName.split(" on Plane")[1]);
+
+        var _actuatorList = AssemblyGroupList[_index].assembly.getAllActuator();
+
+        if (_actuatorList != null) {
+            for (var ai in _actuatorList.array) {
+                var a = _actuatorList.get(ai);
+                if (a instanceof JointActuator) {
+                    if (a.getName() == _name) return a;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    function applyActuator(_a, _value) {
+        _a.setValue(Math.radians(parseInt(_value)));
+        for (var i = 0; i < AssemblyGroupList.length; i++) {
+            var _actuatorList = AssemblyGroupList[i].assembly.getAllActuator();
+
+            if (_actuatorList.contains(_a)) {
+                AssemblyGroupList[i].calculateAssembly();
+            }
+        }
+        try360forAssemblies();
+        currentAssemblyGroup.removeSegmentSelected();
+    }
+
+</script>

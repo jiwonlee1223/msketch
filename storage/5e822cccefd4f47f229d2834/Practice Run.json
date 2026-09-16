@@ -1,0 +1,75 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 5,
+	"holeSize": 4,
+	"linkWidth": 12.7,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "-29.94",
+						"y": "-9.82",
+						"z": "0.00"
+					},
+					{
+						"x": "28.82",
+						"y": "-10.12",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link8",
+					"points": [
+						{
+							"x": "-29.94",
+							"y": "-9.82",
+							"z": "0.00"
+						},
+						{
+							"x": "-18.41",
+							"y": "33.70",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint18",
+					"points": [
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link8",
+							"targetIndex": 0
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [],
+			"motors": []
+		}
+	]
+}

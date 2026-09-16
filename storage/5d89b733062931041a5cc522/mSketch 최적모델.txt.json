@@ -1,0 +1,30 @@
+MSKETCH FILE
+MSKETCH PLANE
+[SPACE](0.00,7.80)(38.92,1.31)
+
+[LINK](Link1**)(0.00,7.80)(0.00,22.80)
+[LINK](Link2**)(0.00,22.80)(48.99,47.05)
+[LINK](Link4**)(48.99,47.05)(38.92,1.31)(82.21,2.67)
+[LINK](Link5**)(0.00,22.80)(20.68,-29.19)
+[LINK](Link6**)(20.68,-29.19)(38.92,1.31)
+[LINK](Link7**)(82.21,2.67)(52.91,-39.85)
+[LINK](Link8**)(20.68,-29.19)(52.91,-39.85)(7.66,-82.37)
+
+[CC](CoaxialConstraint1**)(Link1**,0)(Space,0)
+[CC](CoaxialConstraint4**)(Link4**,0)(Link2**,1)
+[CC](CoaxialConstraint6**)(Link5**,0)(Link1**,1)(Link2**,0)
+[CC](CoaxialConstraint8**)(Space,1)(Link6**,1)(Link4**,1)
+[CC](CoaxialConstraint9**)(Link7**,0)(Link4**,2)
+[CC](CoaxialConstraint10**)(Link8**,0)(Link5**,1)(Link6**,0)
+[CC](CoaxialConstraint11**)(Link7**,1)(Link8**,1)
+
+[JA](JointActuator1**)(CoaxialConstraint1**)(Link1**)(Space)
+[TRJ](Link8**,2)
+
+
+MSKETCH PLANEINFO
+(0)(0.00,0.00,0.00)(0.00,0.00,0.00)
+
+MSKETCH MOTORINFO
+(0,JointActuator1**,DC)(0,100,0)(0,180)
+

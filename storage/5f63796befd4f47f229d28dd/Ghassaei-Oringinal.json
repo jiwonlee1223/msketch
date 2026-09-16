@@ -1,0 +1,381 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 3,
+	"holeSize": 3,
+	"linkWidth": 5,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "0.21",
+						"y": "0.10",
+						"z": "0.00"
+					},
+					{
+						"x": "52.80",
+						"y": "5.00",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link1*",
+					"points": [
+						{
+							"x": "0.21",
+							"y": "0.10",
+							"z": "0.00"
+						},
+						{
+							"x": "38.00",
+							"y": "67.19",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link2*",
+					"points": [
+						{
+							"x": "52.80",
+							"y": "5.00",
+							"z": "0.00"
+						},
+						{
+							"x": "71.92",
+							"y": "22.62",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link3*",
+					"points": [
+						{
+							"x": "71.92",
+							"y": "22.62",
+							"z": "0.00"
+						},
+						{
+							"x": "38.00",
+							"y": "67.19",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link4*",
+					"points": [
+						{
+							"x": "38.00",
+							"y": "67.19",
+							"z": "0.00"
+						},
+						{
+							"x": "-58.22",
+							"y": "50.25",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link6*",
+					"points": [
+						{
+							"x": "-58.22",
+							"y": "50.25",
+							"z": "0.00"
+						},
+						{
+							"x": "0.21",
+							"y": "0.10",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link7*",
+					"points": [
+						{
+							"x": "-58.22",
+							"y": "50.25",
+							"z": "0.00"
+						},
+						{
+							"x": "-60.37",
+							"y": "-47.43",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link9*",
+					"points": [
+						{
+							"x": "69.57",
+							"y": "-33.32",
+							"z": "0.00"
+						},
+						{
+							"x": "0.21",
+							"y": "0.10",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link10*",
+					"points": [
+						{
+							"x": "69.57",
+							"y": "-33.32",
+							"z": "0.00"
+						},
+						{
+							"x": "71.92",
+							"y": "22.62",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link11*",
+					"points": [
+						{
+							"x": "69.57",
+							"y": "-33.32",
+							"z": "0.00"
+						},
+						{
+							"x": "8.99",
+							"y": "-80.86",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link12*",
+					"points": [
+						{
+							"x": "8.99",
+							"y": "-80.86",
+							"z": "0.00"
+						},
+						{
+							"x": "-60.37",
+							"y": "-47.43",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link13*",
+					"points": [
+						{
+							"x": "0.21",
+							"y": "0.10",
+							"z": "0.00"
+						},
+						{
+							"x": "-60.37",
+							"y": "-47.43",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint2*",
+					"points": [
+						{
+							"targetLink": "Link2*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint5*",
+					"points": [
+						{
+							"targetLink": "Link4*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link1*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link3*",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint10*",
+					"points": [
+						{
+							"targetLink": "Link7*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link4*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link6*",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint15*",
+					"points": [
+						{
+							"targetLink": "Link2*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link10*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link3*",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint16*",
+					"points": [
+						{
+							"targetLink": "Link11*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link10*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link9*",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint17*",
+					"points": [
+						{
+							"targetLink": "Link12*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link11*",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint19*",
+					"points": [
+						{
+							"targetLink": "Link13*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link9*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link6*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link1*",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint20*",
+					"points": [
+						{
+							"targetLink": "Link7*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link13*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link12*",
+							"targetIndex": 1
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [
+				{
+					"targetLink": "Link11*",
+					"targetIndex": 1
+				},
+				{
+					"targetLink": "Link7*",
+					"targetIndex": 1
+				},
+				{
+					"targetLink": "Link1*",
+					"targetIndex": 1
+				},
+				{
+					"targetLink": "Link9*",
+					"targetIndex": 0
+				},
+				{
+					"targetLink": "Link2*",
+					"targetIndex": 1
+				}
+			],
+			"motors": [
+				{
+					"name": "Motor1",
+					"targetConstraint": "CoaxialConstraint2*",
+					"targetLink1": "Link2*",
+					"targetLink2": "Anchor",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 0,
+					"range": "0-180"
+				}
+			]
+		}
+	]
+}

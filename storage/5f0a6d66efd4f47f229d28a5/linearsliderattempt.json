@@ -1,0 +1,257 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 5,
+	"holeSize": 4,
+	"linkWidth": 12.7,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "61.77",
+						"y": "-21.82",
+						"z": "0.00"
+					},
+					{
+						"x": "-74.52",
+						"y": "-1.13",
+						"z": "0.00"
+					},
+					{
+						"x": "-68.85",
+						"y": "48.73",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link2",
+					"points": [
+						{
+							"x": "61.77",
+							"y": "-21.82",
+							"z": "0.00"
+						},
+						{
+							"x": "61.77",
+							"y": "9.07",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link3",
+					"points": [
+						{
+							"x": "-74.52",
+							"y": "-1.13",
+							"z": "0.00"
+						},
+						{
+							"x": "-50.95",
+							"y": "-21.51",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link4",
+					"points": [
+						{
+							"x": "-50.95",
+							"y": "-21.51",
+							"z": "0.00"
+						},
+						{
+							"x": "-50.59",
+							"y": "23.24",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Slider6",
+					"points": [
+						{
+							"x": "-50.95",
+							"y": "-21.51",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link7",
+					"points": [
+						{
+							"x": "-68.85",
+							"y": "48.73",
+							"z": "0.00"
+						},
+						{
+							"x": "-50.59",
+							"y": "23.24",
+							"z": "0.00"
+						},
+						{
+							"x": "-88.36",
+							"y": "80.73",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link8",
+					"points": [
+						{
+							"x": "-96.62",
+							"y": "-23.23",
+							"z": "0.00"
+						},
+						{
+							"x": "-33.43",
+							"y": "-21.25",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Slider12",
+					"points": [
+						{
+							"x": "-50.95",
+							"y": "-21.51",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint2",
+					"points": [
+						{
+							"targetLink": "Link2",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint3",
+					"points": [
+						{
+							"targetLink": "Link3",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint6",
+					"points": [
+						{
+							"targetLink": "Link7",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 2
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint7",
+					"points": [
+						{
+							"targetLink": "Link4",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link7",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint10",
+					"points": [
+						{
+							"targetLink": "Link4",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link3",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Slider12",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Slider6",
+							"targetIndex": 0
+						}
+					]
+				}
+			],
+			"sliders": [
+				{
+					"name": "SliderConstraint8",
+					"baseLink": "Link4",
+					"targetLink": "Slider6",
+					"baseIndex1": 0,
+					"baseIndex2": 1
+				},
+				{
+					"name": "SliderConstraint9",
+					"baseLink": "Link8",
+					"targetLink": "Slider12",
+					"baseIndex1": 0,
+					"baseIndex2": 1
+				}
+			],
+			"markers": [
+				{
+					"targetLink": "Link7",
+					"targetIndex": 2
+				}
+			],
+			"motors": [
+				{
+					"name": "Motor1",
+					"targetConstraint": "CoaxialConstraint3",
+					"targetLink1": "Link3",
+					"targetLink2": "Anchor",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 0,
+					"range": "0-180"
+				}
+			]
+		}
+	]
+}

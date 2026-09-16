@@ -1,0 +1,80 @@
+<div class="msketch-panel-container" id="panel_plane" style="display: none">
+    <div class="msketch-panel-title">Plane Position<br>&amp; Rotation</div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="tx" style="width: 32%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_plane_tx">
+        </div>
+        <div class="msketch-panel-label" data-label="ty" style="width: 32%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_plane_ty">
+        </div>
+        <div class="msketch-panel-label" data-label="tz" style="width: 32%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_plane_tz">
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="rx" style="width: 32%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_plane_rx">
+        </div>
+        <div class="msketch-panel-label" data-label="ry" style="width: 32%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_plane_ry">
+        </div>
+        <div class="msketch-panel-label" data-label="rz" style="width: 32%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_plane_rz">
+        </div>
+    </div>
+
+    <button class="msketch-panel-btn-large" id="panel_plane_apply"><i class="material-icons">done</i>Apply</button>
+    <div class="msketch-panel-row">
+        <button class="msketch-panel-btn-large" id="panel_plane_flipHor" style="width: 47%; display:inline-block; float: left"><i class="material-icons">flip</i>Flip Hor</button>
+        <button class="msketch-panel-btn-large" id="panel_plane_flipVert" style="width: 47%; display:inline-block; float: right"><i class="material-icons" style="transform: rotate(90deg); padding-right: 0; height: 29px">flip</i>Flip Vert</button>
+    </div>
+</div>
+
+<script>
+    $('#panel_plane_apply').click( function(){
+        applyPlane();
+    });
+
+    $('#panel_plane').keyup(function(event){
+        if (event.keyCode == 13) {
+            applyPlane();
+        }
+    });
+
+    $('#panel_plane_flipHor').click( function(){
+        planeData = currentAssemblyGroup.getPositionData();
+        planeData.ry = planeData.ry + Math.PI;
+        currentAssemblyGroup.setPositionData(planeData);
+    });
+    $('#panel_plane_flipVert').click( function(){
+        planeData = currentAssemblyGroup.getPositionData();
+        planeData.rx = planeData.rx + Math.PI;
+        currentAssemblyGroup.setPositionData(planeData);
+
+    });
+
+    function getPlaneInfoToPlanePanel(){
+    	//if(!(toolState==TOOL_PTRANS || toolState==TOOL_PROT)) return;
+
+    	planeData = currentAssemblyGroup.getPositionData();
+
+        $('#panel_plane_tx').val( (planeData.tx*SCALE_TRANS).toFixed(2) );
+        $('#panel_plane_ty').val( (planeData.ty*SCALE_TRANS).toFixed(2) );
+        $('#panel_plane_tz').val( (planeData.tz*SCALE_TRANS).toFixed(2) );
+        $('#panel_plane_rx').val( Math.degrees(planeData.rx).toFixed(2) );
+        $('#panel_plane_ry').val( Math.degrees(planeData.ry).toFixed(2) );
+        $('#panel_plane_rz').val( Math.degrees(planeData.rz).toFixed(2) );
+    }
+
+    function applyPlane(){
+    	var tempData = {};
+    	tempData.tx = (parseFloat($('#panel_plane_tx').val())/SCALE_TRANS);
+    	tempData.ty = (parseFloat($('#panel_plane_ty').val())/SCALE_TRANS);
+    	tempData.tz = (parseFloat($('#panel_plane_tz').val())/SCALE_TRANS);
+    	tempData.rx = Math.radians(parseFloat($('#panel_plane_rx').val()));
+    	tempData.ry = Math.radians(parseFloat($('#panel_plane_ry').val()));
+    	tempData.rz = Math.radians(parseFloat($('#panel_plane_rz').val()));
+    	currentAssemblyGroup.setPositionData(tempData);
+    }
+
+</script>

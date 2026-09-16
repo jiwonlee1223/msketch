@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include("header") -%>
+</head>
+
+<body>
+    <div class="msketch-login">
+
+        <div class="msketch-login-box">
+            <div class="msketch-login-logo">M.SKETCH</div>
+            <div class="msketch-login-message"><%=message %></div>
+
+            <form action="/signup" method="post">
+                <div class="msketch-login-label" data-label="Email" style="width: 100%;">
+                    <input class="msketch-login-input" id="signup_email" type="text" name="email" />
+                </div>
+
+                <div class="msketch-login-label" data-label="Name" style="width: 100%;">
+                    <input class="msketch-login-input" id="signup_name" type="text" name="name" />
+                </div>
+
+                <div class="msketch-login-label" data-label="Password" style="width: 100%;">
+                    <input class="msketch-login-input" id="signup_pw" type="password" name="password" />
+                </div>
+
+                <div class="msketch-login-label" data-label="Password Confirm" style="width: 100%;">
+                    <input class="msketch-login-input" id="signup_pw_confirmed" type="password" name="passwordConfirmed" />
+                </div>
+
+                <input class="msketch-login-btn" id="signup_submit" type="submit" value="Sign Up" style="width: 100%;" disabled/>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(".msketch-login-box").css('top', $(document).innerHeight()/2 - $(".msketch-login-box").innerHeight()/2);
+
+        $('#signup_email').on('change keyup paste', checkSignUpInfo);
+        $('#signup_name').on('change keyup paste', checkSignUpInfo);
+        $('#signup_pw').on('change keyup paste', checkSignUpInfo);
+        $('#signup_pw_confirmed').on('change keyup paste', checkSignUpInfo);
+
+        function checkSignUpInfo(){
+            if( $('#signup_email').val()!="" &&
+                $('#signup_name').val()!="" &&
+                $('#signup_pw').val()!="" &&
+                $('#signup_pw_confirmed').val()!="" &&
+                $('#signup_pw').val() == $('#signup_pw_confirmed').val() ){
+                    $("#signup_submit").prop('disabled', false);
+                }else{
+                    $("#signup_submit").prop('disabled', true);
+                }
+        }
+    </script>
+</body>
+
+</html>

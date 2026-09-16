@@ -1,0 +1,342 @@
+<div class="msketch-panel-container" id="panel_opt" style="display: none">
+    <div class="msketch-panel-title">Path<br>Optimization</div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-desc">Optimize current mechanism's movement fitting to target drawing. Draw a movement that you want</div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-desc" id="panel_opt_msg" style="font-style: italic;"></div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="Marker List" style="width: 100%;">
+            <select id="panel_opt_markerIndex" class="form-select msketch-panel-select">
+            </select>
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <button class="msketch-panel-btn-large" id="panel_opt_draw"><i class="material-icons">gesture</i>Draw Target Path</button>
+        <button class="msketch-panel-btn-large" id="panel_opt_remove"><i class="material-icons">delete</i>Remove Target Path</button>
+    </div>
+    <hr>
+    <div class="msketch-panel-row">
+        <button class="msketch-panel-btn-large disableClick" id="panel_opt_run"><i class="material-icons">done</i>Optimize</button>
+        <button class="msketch-panel-btn-large disableClick" id="panel_opt_stop"><i class="material-icons">stop</i>Stop</button>
+    </div>
+</div>
+
+<script>
+
+    var baseTrjObject = null;
+    var baseTrjInd = null;
+
+    $('#panel_opt_run').click( function(){
+        startPathOptimize();
+    });
+    $('#panel_opt_stop').click( function(){
+        stopPathOptimize();
+    });
+    $('#panel_opt_draw').click( function(){
+        if(toolState!=TOOL_OPT){
+            toolState = TOOL_OPT;
+        }
+        else if(toolState==TOOL_OPT){
+            toolState = -1;
+
+        }
+        setTool(toolState);
+        checkToolSet();
+    });
+    $('#panel_opt_remove').click( function(){
+        currentAssemblyGroup.optimizedPath.flush();
+        currentAssemblyGroup.load();
+    });
+
+
+
+    $('#panel_opt_markerIndex').on('mousedown', function(){
+        $('#panel_opt_markerIndex').empty();
+        $.each(currentAssemblyGroup.trajectoryObjList, function (i, item) {
+            $('#panel_opt_markerIndex').append($('<option>', {
+                value: i,
+                text : "Trajectory " + i
+            }));
+        });
+        $('#panel_opt_markerIndex').val(null);
+    });
+
+    $('#panel_opt_markerIndex').on('change', function(){
+        checkBaseTrj(true);
+    });
+
+
+    function checkBaseTrj(_flag){
+        if($('#panel_opt_markerIndex').val()==null) return;
+
+        baseTrjObject = currentAssemblyGroup.trajectoryObjList[parseInt( $('#panel_opt_markerIndex').val() )];
+        baseTrjInd = parseInt( $('#panel_opt_markerIndex').val() );
+        if(baseTrjObject==null) return;
+
+        for(var i=0; i<currentAssemblyGroup.trajectoryObjList.length; i++){
+            if(_flag && baseTrjObject == currentAssemblyGroup.trajectoryObjList[i]){
+                currentAssemblyGroup.trajectoryObjList[i].setColor(0x4bb7ba);
+        	}else{
+                currentAssemblyGroup.trajectoryObjList[i].setColor(0x6a3fc4);
+        	}
+        }
+
+    }
+
+    function flushAllTargetTrj(){
+        for(var i=0; i<AssemblyGroupList.length; i++){
+            AssemblyGroupList[i].optimizedPath.flush();
+        }
+    }
+
+    function startPathOptimize(){
+
+        if(baseTrjObject == null || baseTrjInd == null){
+            showMessage("No base trajectory to optimize.");
+            return;
+        }
+        if(currentAssemblyGroup.optimizedPath.getTrajectory() == null){
+            showMessage("No base trajectory to optimize.");
+            return;
+        }
+
+        for(var i=0; i<AssemblyGroupList.length; i++){
+            AssemblyGroupList[i].hideText();
+        }
+
+        currentInterface.ind = baseTrjInd;
+        currentInterface.Lambda = 5;
+        currentInterface.targetTrj = resample(currentAssemblyGroup.optimizedPath.getTrajectory(), OptInterface.SAMPLE_SIZE);
+        currentInterface.total_iter = 0;
+        currentInterface.accumTime = 0;
+        isPathOptimizing = true;
+
+        showMessage("Path optimization started.");
+    }
+
+    function stopPathOptimize(){
+        if(isPathOptimizing) showMessage("Path optimization finished.");
+        isPathOptimizing = false;
+        //currentInterface.ind = -1;
+
+        for(var i=0; i<AssemblyGroupList.length; i++){
+            AssemblyGroupList[i].showText();
+        }
+    }
+
+    function showOptMsg(_msg){
+        $('#panel_opt_msg').text(_msg);
+    }
+
+
+    // === OPT CORE ===
+
+    // for optimization
+    function optimize() {
+        if (currentInterface.ind==-1) return;
+
+        var iter=0;
+        var isBroken = false;
+        var preAvgGrd = Number.POSITIVE_INFINITY;
+
+        var Epsilon = 0.001;
+        //var Epsilon = 0.0005;
+
+        var TIME_OUT = 20;
+
+        var targetTrj = currentInterface.targetTrj;
+        var cost=getDistScore(currentInterface.ind, targetTrj);
+        var prevCost=cost*2;
+        var STOP_COST_RATIO = 0.0001;
+
+        // Point2D[] targetTrj = resample(t.getTrajectory(), SAMPLE_SIZE);
+
+        var currentTime = new Date().getTime();
+        while ((currentTime+TIME_OUT > (new Date().getTime()) && !isBroken && prevCost>cost*STOP_COST_RATIO) || iter<2) {
+          var pointBackup = new ArrayList();
+          var pointMap = new Object();
+
+          // calc gradient //
+          prevCost = cost;
+          for (var i=0, _length = currentAssembly.getAllElement().length(); i<_length; i++) {
+            if (currentAssembly.getAllElement().get(i) instanceof Link ) { // && !(assembly.getAllElement().get(i) instanceof Space //
+              var l = currentAssembly.getAllElement().get(i);
+
+              for (var j=0, _linkLength = l.getPointList().length(); j<_linkLength; j++) {
+                var pt = l.getPointList().get(j);
+                var opt = new Point2D( pt.getX(), pt.getY() );
+                pointBackup.add(opt);
+
+                pt.setLocation(opt.getX()-Epsilon, opt.getY());
+                var n_dist = getDistScore(currentInterface.ind, targetTrj);
+                pt.setLocation(opt.getX()+Epsilon, opt.getY());
+                var p_dist = getDistScore(currentInterface.ind, targetTrj);
+
+                var deltaX = 0;
+                if (n_dist+p_dist < Number.POSITIVE_INFINITY) {
+                  deltaX = (p_dist-n_dist)/2/Epsilon;
+                }
+
+                pt.setLocation(opt.getX(), opt.getY()-Epsilon);
+                n_dist = getDistScore(currentInterface.ind, targetTrj);
+                pt.setLocation(opt.getX(), opt.getY()+Epsilon);
+                p_dist = getDistScore(currentInterface.ind, targetTrj);
+
+                var deltaY = 0;
+                if (n_dist+p_dist < Number.POSITIVE_INFINITY) {
+                  deltaY = (p_dist-n_dist)/2/Epsilon;
+                }
+
+                pt.setLocation(opt.getX(), opt.getY());
+
+                pointMap[l.name+","+j] = new Point2D(deltaX, deltaY);
+
+                //pt.setLocation(opt.getX()-deltaX*currentInterface.Lambda, opt.getY()-deltaY*currentInterface.Lambda);
+
+              }
+            }
+          }
+
+          // apply decent //
+          for (var i=0, _length = currentAssembly.getAllElement().length(); i<_length; i++) {
+            if (currentAssembly.getAllElement().get(i) instanceof Link) { // && !(assembly.getAllElement().get(i) instanceof Space) ){
+              var l = currentAssembly.getAllElement().get(i);
+
+              for (var j=0, _linkLength = l.getPointList().length(); j<_linkLength; j++) {
+                var pt = l.getPointList().get(j);
+                var grd_pt = pointMap[l.name+","+j];
+
+                if (grd_pt != null) {
+                  pt.setLocation(pt.getX()-grd_pt.getX()*currentInterface.Lambda, pt.getY()-grd_pt.getY()*currentInterface.Lambda);
+                }
+              }
+            }
+          }
+
+          cost = getDistScore(currentInterface.ind, targetTrj);
+          if (cost > prevCost) currentInterface.Lambda *= 0.80;
+          if ( cost == Number.POSITIVE_INFINITY) {
+            //console.log("broken at #"+currentInterface.total_iter);
+            isBroken = true;
+            stopPathOptimize();
+            showMessage("Broken at #"+currentInterface.total_iter);
+
+            var cnt=0;
+            for (var i=0, _length = currentAssembly.getAllElement().length(); i<_length; i++) {
+              if (currentAssembly.getAllElement().get(i) instanceof Link  ) { // && !(assembly.getAllElement().get(i) instanceof Space //
+                var l = currentAssembly.getAllElement().get(i);
+
+                for (var j=0, _linkLength = l.getPointList().length(); j<_linkLength; j++) {
+                  var pt = l.getPointList().get(j);
+                  var opt = pointBackup.get(cnt++);
+
+                  if (opt!=null) {
+                    pt.setLocation(opt.getX(), opt.getY());
+                  }
+                }
+              }
+            }
+
+            break;
+          } else {
+            pointBackup = new ArrayList();
+            currentAssemblyGroup.calculateAssembly();
+          }
+
+          iter++;
+          currentInterface.total_iter++;
+          this.msg="Iteration: "+currentInterface.total_iter + " / Cost: " + Math.abs((prevCost/cost)-1).toFixed(6);
+          //console.log("Iteration #"+currentInterface.total_iter + " / " + Math.abs((prevCost/cost)-1).toFixed(10));
+          showOptMsg(this.msg);
+        }
+
+        for (var i=0, _length = currentAssembly.getAllElement().length(); i<_length; i++) {
+          if (currentAssembly.getAllElement().get(i) instanceof Link && !(currentAssembly.getAllElement().get(i) instanceof Space) ) {
+            var l = currentAssembly.getAllElement().get(i);
+            l.redefineVertex();
+          }
+        }
+
+        if ( isBroken || Math.abs((prevCost/cost).toFixed(10)-1) <= STOP_COST_RATIO ) {
+          stopPathOptimize();
+        }
+
+        //render
+        if(currentInterface.total_iter%2==0){
+            //render();
+        }
+        //render();
+    }
+
+    function resample(pts, number){
+    	var I = pathLength( pts ) / (number-1);
+        var D = 0;
+
+        var returns = new Array(number);
+
+        returns[0] = new Point2D( pts.get(0).getX(), pts.get(0).getY() );
+        var cnt = 1;
+
+        for ( var idx=1, _length = pts.length(); idx<_length; idx++ ) {
+          var d = dist2D(pts.get(idx-1).getX(), pts.get(idx-1).getY(), pts.get(idx).getX(), pts.get(idx).getY());
+          if ( D+d >= I ) {
+            var qx = pts.get(idx-1).getX() + ((I-D) / d) * (pts.get(idx).getX() - pts.get(idx-1).getX() );
+            var qy = pts.get(idx-1).getY() + ((I-D) / d) * (pts.get(idx).getY() - pts.get(idx-1).getY() );
+
+            if (cnt<number) {
+              returns[cnt++] = new Point2D( qx, qy );
+            }
+            pts.set(idx-1, new Point2D( qx, qy ));
+            idx--;
+            D = 0;
+          } else {
+            D += d;
+          }
+        }
+
+        while ( cnt < number ) {
+          returns[cnt++] = pts.get(pts.length()-1);
+        }
+
+        return returns;
+    }
+
+    function pathLength(pts) {
+    	var totalLen = 0;
+    	for (var i=0, _length = pts.length(); i<_length-1; i++) {
+    	  totalLen += dist2D( pts.get(i).getX(), pts.get(i).getY(), pts.get(i+1).getX(), pts.get(i+1).getY() );
+    	}
+    	return totalLen;
+    }
+
+    function dist2D(x1, y1, x2, y2) {
+    	var dx = x1-x2;
+    	var dy = y1-y2;
+    	return Math.sqrt(dx*dx + dy*dy);
+    }
+
+    function getDistScore(resultInd, targetTrjSample) {
+
+    	var cost = currentAssemblyGroup.try360();
+
+    	if ( cost < Number.POSITIVE_INFINITY) {
+          var selectedTrj = currentAssemblyGroup.getTrajectory().get(resultInd).getTrajectory();
+    	  var resultTrj = resample(selectedTrj, OptInterface.SAMPLE_SIZE);
+    	  return compareTrj(targetTrjSample, resultTrj)+cost;
+    	} else {
+    	  return Number.POSITIVE_INFINITY;
+    	}
+    }
+
+    function compareTrj(t1, t2) {
+    	var totalLen = 0;
+    	for (var i=0, _length = t1.length; i<_length; i++) {
+    	  totalLen += dist2D(t1[i].getX(), t1[i].getY(), t2[i].getX(), t2[i].getY());
+    	}
+    	return totalLen/OptInterface.SAMPLE_SIZE;
+    }
+
+
+</script>

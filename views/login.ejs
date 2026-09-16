@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include("header") -%>
+</head>
+
+<body>
+    <div class="msketch-login">
+
+        <div class="msketch-login-box">
+            <div class="msketch-login-logo">M.SKETCH</div>
+            <div class="msketch-login-message"><%=message %></div>
+
+            <form action="/login" method="post">
+                <div class="msketch-login-label" data-label="Email" style="width: 100%;">
+                    <input class="msketch-login-input" type="text" name="email" />
+                </div>
+
+                <div class="msketch-login-label" data-label="Password" style="width: 100%;">
+                    <input class="msketch-login-input" type="password" name="password" />
+                </div>
+
+                <input class="msketch-login-btn" type="submit" value="Login" style="width: 100%;" />
+                <button class="msketch-login-btn" style="width: 100%;" id="msketch_login_signup">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(".msketch-login-box").css('top', $(document).innerHeight()/2 - $(".msketch-login-box").innerHeight()/2);
+        $("#msketch_login_signup").click(function(){
+            location.href="signup";
+            return false;
+        })
+    </script>
+</body>
+
+</html>

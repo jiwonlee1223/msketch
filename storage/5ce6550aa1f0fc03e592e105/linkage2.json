@@ -1,0 +1,248 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 5,
+	"holeSize": 4,
+	"linkWidth": 12.7,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "-54.80",
+						"y": "-27.40",
+						"z": "0.00"
+					},
+					{
+						"x": "-30.04",
+						"y": "-16.44",
+						"z": "0.00"
+					},
+					{
+						"x": "101.88",
+						"y": "21.11",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Link2",
+					"points": [
+						{
+							"x": "-54.80",
+							"y": "-27.40",
+							"z": "0.00"
+						},
+						{
+							"x": "-73.67",
+							"y": "-15.83",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link3",
+					"points": [
+						{
+							"x": "-73.67",
+							"y": "-15.83",
+							"z": "0.00"
+						},
+						{
+							"x": "-28.21",
+							"y": "68.80",
+							"z": "0.00"
+						},
+						{
+							"x": "-53.38",
+							"y": "23.14",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link5",
+					"points": [
+						{
+							"x": "-30.04",
+							"y": "-16.44",
+							"z": "0.00"
+						},
+						{
+							"x": "-74.48",
+							"y": "66.16",
+							"z": "0.00"
+						},
+						{
+							"x": "-53.38",
+							"y": "23.14",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link9",
+					"points": [
+						{
+							"x": "101.88",
+							"y": "21.11",
+							"z": "0.00"
+						},
+						{
+							"x": "131.71",
+							"y": "37.14",
+							"z": "0.00"
+						},
+						{
+							"x": "78.74",
+							"y": "-12.99",
+							"z": "0.00"
+						},
+						{
+							"x": "101.88",
+							"y": "21.11",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link10",
+					"points": [
+						{
+							"x": "101.88",
+							"y": "21.11",
+							"z": "0.00"
+						},
+						{
+							"x": "131.31",
+							"y": "-10.96",
+							"z": "0.00"
+						},
+						{
+							"x": "92.55",
+							"y": "51.35",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint3",
+					"points": [
+						{
+							"targetLink": "Link3",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link2",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint6",
+					"points": [
+						{
+							"targetLink": "Link3",
+							"targetIndex": 2
+						},
+						{
+							"targetLink": "Link5",
+							"targetIndex": 2
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint12",
+					"points": [
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 2
+						},
+						{
+							"targetLink": "Link9",
+							"targetIndex": 3
+						},
+						{
+							"targetLink": "Link10",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link9",
+							"targetIndex": 3
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint15",
+					"points": [
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Link2",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint16",
+					"points": [
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Link5",
+							"targetIndex": 0
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [],
+			"motors": [
+				{
+					"name": "Motor2",
+					"targetConstraint": "CoaxialConstraint12",
+					"targetLink1": "Anchor",
+					"targetLink2": "Link9",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 0,
+					"range": "0-180"
+				},
+				{
+					"name": "Motor4",
+					"targetConstraint": "CoaxialConstraint15",
+					"targetLink1": "Anchor",
+					"targetLink2": "Link2",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 0,
+					"range": "0-180"
+				}
+			]
+		}
+	]
+}

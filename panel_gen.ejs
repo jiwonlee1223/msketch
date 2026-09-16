@@ -1,0 +1,1045 @@
+<!-- Linkage generation panel
+made by yunwoo jeong -->
+<!-- yw2 -->
+
+<div class="msketch-panel-container" id="panel_gen" style="display: none">
+    <div class="msketch-panel-title">Linkage<br>Generation</div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-desc">Generate the linkage mechanism. Draw a movement that you want</div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-desc" id="panel_gen_msg" style="font-style: italic;"></div>
+    </div>
+    <div class="msketch-panel-row">
+        <button class="msketch-panel-btn-large" id="panel_gen_draw"><i class="material-icons">gesture</i>Draw Target Path</button>
+        <button class="msketch-panel-btn-large" id="panel_gen_remove"><i class="material-icons">delete</i>Remove Target Path</button>
+    </div>
+    <hr>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="Mechanism Type" style="width: 100%;">
+            <label class="form-radio" style="width: 49%;">
+                <input type="radio" name="gender" id="panel_gen_4" checked>
+                <i class="form-icon"></i> <span class="msketch-panel-desc">4-bar</span>
+            </label>
+            <!-- <label class="form-radio" style="width: 49%;">
+                    <input type="radio" name="gender" id="panel_gen_6" >
+            <i class="form-icon"></i> <span class="msketch-panel-desc">6-bar</span>
+            </label> -->
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <button class="msketch-panel-btn-large" id="panel_gen_run"><i class="material-icons">done</i>Generate</button>
+    </div>
+</div>
+
+<script>
+
+  $('#panel_gen_draw').click( function(){
+      if(toolState!=TOOL_OPT){
+          toolState = TOOL_OPT;
+      }
+      else if(toolState==TOOL_OPT){
+          toolState = -1;
+
+      }
+      setTool(toolState);
+      checkToolSet();
+  });
+
+  $('#panel_gen_remove').click( function(){
+      currentAssemblyGroup.optimizedPath.flush();
+      currentAssemblyGroup.load();
+  });
+
+  $('#panel_gen_run').click( function(){
+    if( $('#panel_gen_4').prop('checked') ){
+        var t0 = performance.now();
+        startFourbarGeneration();
+        var t1 = performance.now();
+        console.log("Call to startFourbarGeneration took " + (t1 - t0) + " milliseconds.")
+    }
+    // else if( $('#panel_gen_6').prop('checked') ){
+    //     var t0 = performance.now();
+    //     startWattGeneration();
+    //     var t1 = performance.now();
+    //     console.log("Call to startFourbarGeneration took " + (t1 - t0) + " milliseconds.")
+    // }
+  });
+
+var wattDataPath = "/public/res/WattDataSet";
+var fourbarDataPath = "/public/res/FourbarDataSet";
+var WEIGHT_DIST = 10;
+var WEIGHT_ANGLE = 0.1;
+var WATT_SAMPLE_SIZE = 16;
+var FOURBAR_SAMPLE_SIZE = 16;
+var NUM_OF_WATT_DATASET = 5;
+var NUM_OF_FOURBAR_DATASET = 1;
+// var sampleWattTrj = loadWattSet();
+var sampleFourbarTrj = loadFourbarSet();
+
+function startWattGeneration(){
+    var targetPathData = currentAssemblyGroup.optimizedPath.getTrajectory();
+    try360forAssemblies();
+    var _sampleSize = WATT_SAMPLE_SIZE;
+    var tempTrj = [];
+		if(currentAssemblyGroup.optimizedPath.getTrajectory() == null){
+	        showSnackBar("최적화 목적 궤적 없음", "No target trajectory to optimize");
+	        return;
+	   }
+    var positionTrj = resample(currentAssemblyGroup.optimizedPath.getTrajectory(), _sampleSize);
+    _trjData = normalizeTrj(positionTrj);
+    tempTrj = _trjData.trajectory;
+
+    getSimilarWatt(tempTrj, sampleWattTrj, targetPathData);
+
+    //get optimized path
+    currentAssemblyGroup.optimizedPath = new Trajectory(); //새 파일 열때 정보가 저장이 안되있어서 비우고 새로 만듬
+    currentAssemblyGroup.optimizedPath.flush();
+
+    for(var i in targetPathData.array){
+      var a =targetPathData.get(i)
+      currentAssemblyGroup.optimizedPath.getTrajectory().add(a);
+      currentAssemblyGroup.load();
+    }
+}
+
+function startFourbarGeneration(){
+    var targetPathData = currentAssemblyGroup.optimizedPath.getTrajectory();
+    try360forAssemblies();
+    var _sampleSize = FOURBAR_SAMPLE_SIZE;
+    var tempTrj = [];
+		if(currentAssemblyGroup.optimizedPath.getTrajectory() == null){
+        showSnackBar("최적화 목적 궤적 없음", "No target trajectory to optimize");
+        return;
+	  }
+    var positionTrj = resample(currentAssemblyGroup.optimizedPath.getTrajectory(), _sampleSize);
+    _trjData = normalizeTrj(positionTrj);
+    tempTrj = _trjData.trajectory;
+
+    getSimilarFourbar(tempTrj, sampleFourbarTrj, targetPathData);
+
+    //get optimized path
+    currentAssemblyGroup.optimizedPath = new Trajectory();
+    currentAssemblyGroup.optimizedPath.flush();
+
+    for(var i in targetPathData.array){
+      var a =targetPathData.get(i)
+      currentAssemblyGroup.optimizedPath.getTrajectory().add(a);
+      currentAssemblyGroup.load();
+    }
+}
+
+function loadWattSet(){
+    var _returnData = [];
+    for(var j=0; j<NUM_OF_WATT_DATASET; j++){
+      xmlhttp = new XMLHttpRequest();
+    	xmlhttp.open("GET", wattDataPath+"_"+j+".txt" ,false);
+    	xmlhttp.send(null);
+    	var _data = xmlhttp.responseText;
+
+        var _lineData = _data.split("\r\n");
+        for(i=0; i<_lineData.length; i++){
+            if(_lineData[i]!="") _returnData.push(JSON.parse(_lineData[i]));
+        }
+    }
+    console.log("Loaded: " + _returnData.length);
+    return _returnData;
+}
+
+function loadFourbarSet(){
+    var _returnData = [];
+    for(var j=0; j<NUM_OF_FOURBAR_DATASET; j++){
+      xmlhttp = new XMLHttpRequest();
+    	xmlhttp.open("GET", fourbarDataPath+"_"+j+".txt" ,false);
+    	xmlhttp.send(null);
+    	var _data = xmlhttp.responseText;
+
+        var _lineData = _data.split("\r\n");
+        for(i=0; i<_lineData.length; i++){
+            if(_lineData[i]!="") _returnData.push(JSON.parse(_lineData[i]));
+        }
+    }
+    console.log("Loaded: " + _returnData.length);
+    return _returnData;
+}
+
+
+function loadJSON(_dataJSON, _isNew){
+  	//check header
+  	if(_dataJSON.app != "EDISON" || _dataJSON.type != "Assembly"){
+  		showMessage("Wrong File");
+  		return null;
+  	}else{
+  		makeNewFile();
+  	}
+  	// generate planes
+  	for(var i=0; i<_dataJSON.sketches.length; i++){
+  		loadMsketchInfoForPlane(_dataJSON.sketches[i], _isNew)
+  	}
+  	try360forAssemblies();
+  	updateMotorList();
+  	removeAssemblyGroup(0);
+}
+
+function getSimilarWatt(_trjArr, _dataset, _targetTrj){
+    var _lowestDist = Number.POSITIVE_INFINITY;
+    var _targetPoints = null;
+
+    for(var i in _dataset){
+        var dtwTrj = new DynamicTimeWarping(reOrderArray(_trjArr), reOrderArray(_dataset[i].trajectory), distFuncTrj);
+        var distTrj = dtwTrj.getDistance()/(dtwTrj.getPath().length);
+
+        var distAngle = 0
+
+        var _totalDist = WEIGHT_DIST * distTrj + WEIGHT_ANGLE * distAngle/(2*Math.PI); // weight
+        if(_totalDist < _lowestDist){
+            _lowestDist = _totalDist;
+            _targetPoints = _dataset[i].points;
+            _dir = _dataset[i].dir;
+            _targetTrajectory = _dataset[i].trajectory
+            console.log("[Calc] DistTRJ: " + distTrj + " / DistAngle: " + distAngle);
+        }
+    }
+    console.log("LowestDist: " + _lowestDist);
+    drawWatt(_targetPoints, _dir, 0, 0);
+
+    //set trj poistion and motor phase
+    //set motor phase
+    var _optTrj = currentAssemblyGroup.getTrajectory().get(0).getTrajectory();
+    var _centerTargetTrj = findCenterPosition(_targetTrj);
+    var _centerOptTrj = findCenterPosition(_optTrj);
+
+    var _ftX = _targetTrj.get(0).x *0.1;
+    var _ftY = _targetTrj.get(0).y *0.1;
+    var _targetPathFirstPointAngle = Math.atan2((_ftY-_centerTargetTrj.y*0.1),(_ftX-_centerTargetTrj.x*0.1));
+    if(_targetPathFirstPointAngle<0){
+      _targetPathFirstPointAngle = 2*Math.PI + _targetPathFirstPointAngle;
+    }
+
+    var _foX = _optTrj.get(0).x *0.1;
+    var _foY = _optTrj.get(0).y *0.1;
+    var _optPathFirstPointAngle = Math.atan2((_foY-_centerOptTrj.y*0.1),(_foX-_centerOptTrj.x*0.1));
+    if(_optPathFirstPointAngle<0){
+      _optPathFirstPointAngle = 2*Math.PI + _optPathFirstPointAngle;
+    }
+
+    var _motorPhase = (_optPathFirstPointAngle-_targetPathFirstPointAngle)*180/Math.PI;
+    if(_motorPhase <0){
+      _motorPhase = 360 + _motorPhase;
+    }
+
+    //move trj
+    var _dx = (_centerTargetTrj.x - _centerOptTrj.x) * 0.1;
+    var _dy = (_centerTargetTrj.y - _centerOptTrj.y) * 0.1;
+
+    for(i=0; i<_targetPoints.length; i++){
+      _targetPoints[i].x += _dx;
+      _targetPoints[i].y += _dy;
+    }
+
+    //scale trj
+    var _ratio = (findMaxY(_targetTrj)-findMinY(_targetTrj))/(findMaxY(_optTrj)-findMinY(_optTrj));
+    for(var i=0; i<_targetPoints.length; i++){
+        _targetPoints[i] = scaleFromPoint(_targetPoints[i], _ratio, _centerTargetTrj.x * 0.1, _centerTargetTrj.y * 0.1);
+    }
+
+    drawWatt(_targetPoints, _dir, 0, _motorPhase);
+}
+
+function getSimilarFourbar(_trjArr, _dataset, _targetTrj){
+    var _lowestDist = Number.POSITIVE_INFINITY;
+    var _targetPoints = null;
+
+    for(var i in _dataset){
+        var dtwTrj = new DynamicTimeWarping(reOrderArray(_trjArr), reOrderArray(_dataset[i].trajectory), distFuncTrj);
+        var distTrj = dtwTrj.getDistance()/(dtwTrj.getPath().length);
+
+        var distAngle = 0
+
+        var _totalDist = WEIGHT_DIST * distTrj + WEIGHT_ANGLE * distAngle/(2*Math.PI); // weight
+        if(_totalDist < _lowestDist){
+            _lowestDist = _totalDist;
+            _targetPoints = _dataset[i].points;
+            _dir = _dataset[i].dir;
+            _targetTrajectory = _dataset[i].trajectory
+            console.log("[Calc] DistTRJ: " + distTrj + " / DistAngle: " + distAngle);
+        }
+    }
+    console.log("LowestDist: " + _lowestDist);
+    drawFourbar(_targetPoints, _dir, 0, 0);
+
+    //set trj poistion and motor phase
+    //set motor phase
+    var _optTrj = currentAssemblyGroup.getTrajectory().get(0).getTrajectory();
+    var _centerTargetTrj = findCenterPosition(_targetTrj);
+    var _centerOptTrj = findCenterPosition(_optTrj);
+
+    var _ftX = _targetTrj.get(0).x *0.1;
+    var _ftY = _targetTrj.get(0).y *0.1;
+    var _targetPathFirstPointAngle = Math.atan2((_ftY-_centerTargetTrj.y*0.1),(_ftX-_centerTargetTrj.x*0.1));
+    if(_targetPathFirstPointAngle<0){
+      _targetPathFirstPointAngle = 2*Math.PI + _targetPathFirstPointAngle;
+    }
+
+    var _foX = _optTrj.get(0).x *0.1;
+    var _foY = _optTrj.get(0).y *0.1;
+    var _optPathFirstPointAngle = Math.atan2((_foY-_centerOptTrj.y*0.1),(_foX-_centerOptTrj.x*0.1));
+    if(_optPathFirstPointAngle<0){
+      _optPathFirstPointAngle = 2*Math.PI + _optPathFirstPointAngle;
+    }
+
+    var _motorPhase = (_optPathFirstPointAngle-_targetPathFirstPointAngle)*180/Math.PI;
+    if(_motorPhase <0){
+      _motorPhase = 360 + _motorPhase;
+    }
+
+    //move trj
+    var _dx = (_centerTargetTrj.x - _centerOptTrj.x) * 0.1;
+    var _dy = (_centerTargetTrj.y - _centerOptTrj.y) * 0.1;
+
+    for(i=0; i<_targetPoints.length; i++){
+      _targetPoints[i].x += _dx;
+      _targetPoints[i].y += _dy;
+    }
+
+    //scale trj
+    var _ratio = (findMaxY(_targetTrj)-findMinY(_targetTrj))/(findMaxY(_optTrj)-findMinY(_optTrj));
+    for(var i=0; i<_targetPoints.length; i++){
+        _targetPoints[i] = scaleFromPoint(_targetPoints[i], _ratio, _centerTargetTrj.x * 0.1, _centerTargetTrj.y * 0.1);
+    }
+
+    drawFourbar(_targetPoints, _dir, 0, _motorPhase);
+}
+
+function scaleFromPoint(_p, _ratio, _x, _y){ // (_p{x: , y: }, ratio, x, y)
+  var _qx = _p.x - (_p.x-_x)*(1-_ratio);
+  var _qy = _p.y - (_p.y-_y)*(1-_ratio);
+  return {x: _qx, y: _qy};
+}
+
+function findMaxY(_trj){  //find maximum y value of trj point
+  var _yMax = Number.NEGATIVE_INFINITY;
+  for(var i in _trj.array){
+    if(_trj.get(i).y > _yMax){
+        _yMax = _trj.get(i).y;
+    }
+  }
+  return _yMax;
+}
+
+function findMinY(_trj){ //find minimum y value of trj point
+  var _yMin = Number.POSITIVE_INFINITY;
+  for(var i in _trj.array){
+    if(_trj.get(i).y < _yMin){
+        _yMin = _trj.get(i).y;
+    }
+  }
+  return _yMin;
+}
+
+function drawWatt(_parr, _dir, _angle, _motorPhase){
+
+    var tempWattObject = {"app":"EDISON","type":"Assembly","fileVersion":"2.0","description":"Saved From M.Sketch v3.0","sketches":[{"plane":{"name":"Plane0","translation":{"x":"0.00","y":"0.00","z":"0.00"},"rotation":{"x":"0.00","y":"0.00","z":"0.00"}},"anchor":{"points":[{"x":"0.00","y":"0.00","z":"0.00"},{"x":"100.00","y":"0.00","z":"0.00"}]},"links":[{"name":"Crank","points":[{"x":"0.00","y":"0.00","z":"0.00"},{"x":"0.00","y":"40.00","z":"0.00"}]},{"name":"Rocker","points":[{"x":"100.00","y":"0.00","z":"0.00"},{"x":"100.00","y":"50.00","z":"0.00"},{"x":"100.00","y":"25.00","z":"0.00"}]},{"name":"Coupler1","points":[{"x":"0.00","y":"40.00","z":"0.00"},{"x":"100.00","y":"50.00","z":"0.00"}]},{"name":"Coupler2","points":[{"x":"-0.00","y":"40.00","z":"0.00"},{"x":"35.86","y":"74.96","z":"0.00"}]},{"name":"Coupler3","points":[{"x":"35.86","y":"74.96","z":"0.00"},{"x":"100.00","y":"50.00","z":"0.00"}]},{"name":"WattCoupler","points":[{"x":"100.00","y":"25.00","z":"0.00"},{"x":"132.75","y":"109.40","z":"0.00"}]},{"name":"TargetLink","points":[{"x":"132.75","y":"109.40","z":"0.00"},{"x":"35.86","y":"74.96","z":"0.00"},{"x":"85.27","y":"92.72","z":"0.00"}]}],"constraints":[{"name":"CoaxialConstraint1","points":[{"targetLink":"Crank","targetIndex":0},{"targetLink":"Anchor","targetIndex":0}]},{"name":"CoaxialConstraint2","points":[{"targetLink":"Rocker","targetIndex":0},{"targetLink":"Anchor","targetIndex":1}]},{"name":"CoaxialConstraint3","points":[{"targetLink":"Coupler2","targetIndex":0},{"targetLink":"Crank","targetIndex":1},{"targetLink":"Coupler1","targetIndex":0}]},{"name":"CoaxialConstraint4","points":[{"targetLink":"Rocker","targetIndex":1},{"targetLink":"Coupler3","targetIndex":1},{"targetLink":"Coupler1","targetIndex":1}]},{"name":"CoaxialConstraint5","points":[{"targetLink":"WattCoupler","targetIndex":0},{"targetLink":"Rocker","targetIndex":2}]},{"name":"CoaxialConstraint6","points":[{"targetLink":"TargetLink","targetIndex":0},{"targetLink":"WattCoupler","targetIndex":1}]},{"name":"CoaxialConstraint7","points":[{"targetLink":"Coupler2","targetIndex":1},{"targetLink":"TargetLink","targetIndex":1},{"targetLink":"Coupler3","targetIndex":0}]}],"sliders":[],"markers":[{"targetLink":"TargetLink","targetIndex":2}],"motors":[{"name":"Motor1","targetConstraint":"CoaxialConstraint1","targetLink1":"Crank","targetLink2":"Anchor","type":"DC","direction":0,"speed":100,"phase":0,"range":"0-180"}]}]}
+
+    //anchor
+    tempWattObject.sketches[0].anchor.points[0].x = _parr[0].x; //a1
+    tempWattObject.sketches[0].anchor.points[0].y = _parr[0].y;
+    tempWattObject.sketches[0].anchor.points[1].x = _parr[1].x; //a2
+    tempWattObject.sketches[0].anchor.points[1].y = _parr[1].y;
+
+    //crank
+    tempWattObject.sketches[0].links[0].points[0].x = _parr[0].x; //a1
+    tempWattObject.sketches[0].links[0].points[0].y = _parr[0].y;
+    tempWattObject.sketches[0].links[0].points[1].x = _parr[2].x; //a2
+    tempWattObject.sketches[0].links[0].points[1].y = _parr[2].y;
+
+    //Rocker
+    tempWattObject.sketches[0].links[1].points[0].x = _parr[1].x; //a1
+    tempWattObject.sketches[0].links[1].points[0].y = _parr[1].y;
+    tempWattObject.sketches[0].links[1].points[1].x = _parr[3].x; //a2
+    tempWattObject.sketches[0].links[1].points[1].y = _parr[3].y;
+    tempWattObject.sketches[0].links[1].points[2].x = _parr[5].x; //a2
+    tempWattObject.sketches[0].links[1].points[2].y = _parr[5].y;
+
+    //Coupler1
+    tempWattObject.sketches[0].links[2].points[0].x = _parr[2].x; //p1
+    tempWattObject.sketches[0].links[2].points[0].y = _parr[2].y;
+    tempWattObject.sketches[0].links[2].points[1].x = _parr[3].x; //p2
+    tempWattObject.sketches[0].links[2].points[1].y = _parr[3].y;
+
+    //Coupler2
+    tempWattObject.sketches[0].links[3].points[0].x = _parr[2].x; //p1
+    tempWattObject.sketches[0].links[3].points[0].y = _parr[2].y;
+    tempWattObject.sketches[0].links[3].points[1].x = _parr[4].x; //p3
+    tempWattObject.sketches[0].links[3].points[1].y = _parr[4].y;
+
+    //Coupler3
+    tempWattObject.sketches[0].links[4].points[0].x = _parr[4].x; //p3
+    tempWattObject.sketches[0].links[4].points[0].y = _parr[4].y;
+    tempWattObject.sketches[0].links[4].points[1].x = _parr[3].x; //p2
+    tempWattObject.sketches[0].links[4].points[1].y = _parr[3].y;
+
+    //WattCoupler
+    tempWattObject.sketches[0].links[5].points[0].x = _parr[5].x; //c1
+    tempWattObject.sketches[0].links[5].points[0].y = _parr[5].y;
+    tempWattObject.sketches[0].links[5].points[1].x = _parr[6].x; //c2
+    tempWattObject.sketches[0].links[5].points[1].y = _parr[6].y;
+
+    //TargetLink
+    var _target_center_x = (_parr[4].x + _parr[6].x)/2;
+    var _target_center_y = (_parr[4].y + _parr[6].y)/2;
+    tempWattObject.sketches[0].links[6].points[0].x = _parr[6].x; //c2
+    tempWattObject.sketches[0].links[6].points[0].y = _parr[6].y;
+    tempWattObject.sketches[0].links[6].points[1].x = _parr[4].x; //p3
+    tempWattObject.sketches[0].links[6].points[1].y = _parr[4].y;
+    tempWattObject.sketches[0].links[6].points[2].x = _target_center_x; //(c2+p3)/2
+    tempWattObject.sketches[0].links[6].points[2].y = _target_center_y;
+
+    tempWattObject.sketches[0].motors[0].phase = _motorPhase;
+    tempWattObject.sketches[0].motors[0].direction = _dir;
+
+    loadJSON(tempWattObject, true);
+}
+
+  /////drawWatt function for generateWatt
+function drawWatt_generate(_parr, _dir, _angle, _motorPhase){
+
+  var tempWattObject = {"app":"EDISON","type":"Assembly","fileVersion":"2.0","description":"Saved From M.Sketch v3.0","sketches":[{"plane":{"name":"Plane0","translation":{"x":"0.00","y":"0.00","z":"0.00"},"rotation":{"x":"0.00","y":"0.00","z":"0.00"}},"anchor":{"points":[{"x":"0.00","y":"0.00","z":"0.00"},{"x":"100.00","y":"0.00","z":"0.00"}]},"links":[{"name":"Crank","points":[{"x":"0.00","y":"0.00","z":"0.00"},{"x":"0.00","y":"40.00","z":"0.00"}]},{"name":"Rocker","points":[{"x":"100.00","y":"0.00","z":"0.00"},{"x":"100.00","y":"50.00","z":"0.00"},{"x":"100.00","y":"25.00","z":"0.00"}]},{"name":"Coupler1","points":[{"x":"0.00","y":"40.00","z":"0.00"},{"x":"100.00","y":"50.00","z":"0.00"}]},{"name":"Coupler2","points":[{"x":"-0.00","y":"40.00","z":"0.00"},{"x":"35.86","y":"74.96","z":"0.00"}]},{"name":"Coupler3","points":[{"x":"35.86","y":"74.96","z":"0.00"},{"x":"100.00","y":"50.00","z":"0.00"}]},{"name":"WattCoupler","points":[{"x":"100.00","y":"25.00","z":"0.00"},{"x":"132.75","y":"109.40","z":"0.00"}]},{"name":"TargetLink","points":[{"x":"132.75","y":"109.40","z":"0.00"},{"x":"35.86","y":"74.96","z":"0.00"},{"x":"85.27","y":"92.72","z":"0.00"}]}],"constraints":[{"name":"CoaxialConstraint1","points":[{"targetLink":"Crank","targetIndex":0},{"targetLink":"Anchor","targetIndex":0}]},{"name":"CoaxialConstraint2","points":[{"targetLink":"Rocker","targetIndex":0},{"targetLink":"Anchor","targetIndex":1}]},{"name":"CoaxialConstraint3","points":[{"targetLink":"Coupler2","targetIndex":0},{"targetLink":"Crank","targetIndex":1},{"targetLink":"Coupler1","targetIndex":0}]},{"name":"CoaxialConstraint4","points":[{"targetLink":"Rocker","targetIndex":1},{"targetLink":"Coupler3","targetIndex":1},{"targetLink":"Coupler1","targetIndex":1}]},{"name":"CoaxialConstraint5","points":[{"targetLink":"WattCoupler","targetIndex":0},{"targetLink":"Rocker","targetIndex":2}]},{"name":"CoaxialConstraint6","points":[{"targetLink":"TargetLink","targetIndex":0},{"targetLink":"WattCoupler","targetIndex":1}]},{"name":"CoaxialConstraint7","points":[{"targetLink":"Coupler2","targetIndex":1},{"targetLink":"TargetLink","targetIndex":1},{"targetLink":"Coupler3","targetIndex":0}]}],"sliders":[],"markers":[{"targetLink":"Coupler2","targetIndex":1},{"targetLink":"TargetLink","targetIndex":2},{"targetLink":"WattCoupler","targetIndex":1}],"motors":[{"name":"Motor1","targetConstraint":"CoaxialConstraint1","targetLink1":"Crank","targetLink2":"Anchor","type":"DC","direction":0,"speed":100,"phase":0,"range":"0-180"}]}]}
+
+
+  //anchor
+  tempWattObject.sketches[0].anchor.points[0].x = _parr[0].x; //a1
+  tempWattObject.sketches[0].anchor.points[0].y = _parr[0].y;
+  tempWattObject.sketches[0].anchor.points[1].x = _parr[1].x; //a2
+  tempWattObject.sketches[0].anchor.points[1].y = _parr[1].y;
+
+  //crank
+  tempWattObject.sketches[0].links[0].points[0].x = _parr[0].x; //a1
+  tempWattObject.sketches[0].links[0].points[0].y = _parr[0].y;
+  tempWattObject.sketches[0].links[0].points[1].x = _parr[2].x; //a2
+  tempWattObject.sketches[0].links[0].points[1].y = _parr[2].y;
+
+  //Rocker
+  tempWattObject.sketches[0].links[1].points[0].x = _parr[1].x; //a1
+  tempWattObject.sketches[0].links[1].points[0].y = _parr[1].y;
+  tempWattObject.sketches[0].links[1].points[1].x = _parr[3].x; //a2
+  tempWattObject.sketches[0].links[1].points[1].y = _parr[3].y;
+  tempWattObject.sketches[0].links[1].points[2].x = _parr[5].x; //a2
+  tempWattObject.sketches[0].links[1].points[2].y = _parr[5].y;
+
+  //Coupler1
+  tempWattObject.sketches[0].links[2].points[0].x = _parr[2].x; //p1
+  tempWattObject.sketches[0].links[2].points[0].y = _parr[2].y;
+  tempWattObject.sketches[0].links[2].points[1].x = _parr[3].x; //p2
+  tempWattObject.sketches[0].links[2].points[1].y = _parr[3].y;
+
+  //Coupler2
+  tempWattObject.sketches[0].links[3].points[0].x = _parr[2].x; //p1
+  tempWattObject.sketches[0].links[3].points[0].y = _parr[2].y;
+  tempWattObject.sketches[0].links[3].points[1].x = _parr[4].x; //p3
+  tempWattObject.sketches[0].links[3].points[1].y = _parr[4].y;
+
+  //Coupler3
+  tempWattObject.sketches[0].links[4].points[0].x = _parr[4].x; //p3
+  tempWattObject.sketches[0].links[4].points[0].y = _parr[4].y;
+  tempWattObject.sketches[0].links[4].points[1].x = _parr[3].x; //p2
+  tempWattObject.sketches[0].links[4].points[1].y = _parr[3].y;
+
+  //WattCoupler
+  tempWattObject.sketches[0].links[5].points[0].x = _parr[5].x; //c1
+  tempWattObject.sketches[0].links[5].points[0].y = _parr[5].y;
+  tempWattObject.sketches[0].links[5].points[1].x = _parr[6].x; //c2
+  tempWattObject.sketches[0].links[5].points[1].y = _parr[6].y;
+
+  //TargetLink
+  var _target_center_x = (_parr[4].x + _parr[6].x)/2;
+  var _target_center_y = (_parr[4].y + _parr[6].y)/2;
+  tempWattObject.sketches[0].links[6].points[0].x = _parr[6].x; //c2
+  tempWattObject.sketches[0].links[6].points[0].y = _parr[6].y;
+  tempWattObject.sketches[0].links[6].points[1].x = _parr[4].x; //p3
+  tempWattObject.sketches[0].links[6].points[1].y = _parr[4].y;
+  tempWattObject.sketches[0].links[6].points[2].x = _target_center_x; //(c2+p3)/2
+  tempWattObject.sketches[0].links[6].points[2].y = _target_center_y;
+
+  tempWattObject.sketches[0].motors[0].phase = _motorPhase;
+  tempWattObject.sketches[0].motors[0].direction = _dir;
+
+  loadJSON(tempWattObject, true);
+}
+
+function drawFourbar(_parr, _dir, _angle, _motorPhase){
+    var tempFourbarObject = {"app":"EDISON","type":"Assembly","fileVersion":"2.0","description":"Saved From M.Sketch v3.0","sketches":[{"plane":{"name":"Plane0","translation":{"x":"0.00","y":"0.00","z":"0.00"},"rotation":{"x":"0.00","y":"0.00","z":"0.00"}},"anchor":{"points":[{"x":"0.00","y":"0.00","z":"0.00"},{"x":"50.00","y":"0.00","z":"0.00"}]},"links":[{"name":"Crank","points":[{"x":"0.00","y":"0.00","z":"0.00"},{"x":"0.00","y":"25.00","z":"0.00"}]},{"name":"Rocker","points":[{"x":"50.00","y":"0.00","z":"0.00"},{"x":"50.00","y":"50.00","z":"0.00"}]},{"name":"Coupler1","points":[{"x":"0.00","y":"25.00","z":"0.00"},{"x":"50.00","y":"50.00","z":"0.00"}]},{"name":"Coupler2","points":[{"x":"-0.00","y":"25.00","z":"0.00"},{"x":"-0.00","y":"50.00","z":"0.00"}]},{"name":"Coupler3","points":[{"x":"-0.00","y":"50.00","z":"0.00"},{"x":"50.00","y":"50.00","z":"0.00"}]}],"constraints":[{"name":"CoaxialConstraint1","points":[{"targetLink":"Crank","targetIndex":0},{"targetLink":"Anchor","targetIndex":0}]},{"name":"CoaxialConstraint2","points":[{"targetLink":"Rocker","targetIndex":0},{"targetLink":"Anchor","targetIndex":1}]},{"name":"CoaxialConstraint5","points":[{"targetLink":"Coupler2","targetIndex":0},{"targetLink":"Crank","targetIndex":1},{"targetLink":"Coupler1","targetIndex":0}]},{"name":"CoaxialConstraint6","points":[{"targetLink":"Coupler3","targetIndex":0},{"targetLink":"Coupler2","targetIndex":1}]},{"name":"CoaxialConstraint7","points":[{"targetLink":"Rocker","targetIndex":1},{"targetLink":"Coupler3","targetIndex":1},{"targetLink":"Coupler1","targetIndex":1}]}],"sliders":[],"markers":[{"targetLink":"Coupler2","targetIndex":1}],"motors":[{"name":"Motor1","targetConstraint":"CoaxialConstraint1","targetLink1":"Crank","targetLink2":"Anchor","type":"DC","direction":0,"speed":100,"phase":0,"range":"0-180"}]}]}
+    //anchor
+    tempFourbarObject.sketches[0].anchor.points[0].x = _parr[0].x; //a1
+    tempFourbarObject.sketches[0].anchor.points[0].y = _parr[0].y;
+    tempFourbarObject.sketches[0].anchor.points[1].x = _parr[1].x; //a2
+    tempFourbarObject.sketches[0].anchor.points[1].y = _parr[1].y;
+
+    //crank
+    tempFourbarObject.sketches[0].links[0].points[0].x = _parr[0].x; //a1
+    tempFourbarObject.sketches[0].links[0].points[0].y = _parr[0].y;
+    tempFourbarObject.sketches[0].links[0].points[1].x = _parr[2].x; //a2
+    tempFourbarObject.sketches[0].links[0].points[1].y = _parr[2].y;
+
+    //Rocker
+    tempFourbarObject.sketches[0].links[1].points[0].x = _parr[1].x; //a1
+    tempFourbarObject.sketches[0].links[1].points[0].y = _parr[1].y;
+    tempFourbarObject.sketches[0].links[1].points[1].x = _parr[3].x; //a2
+    tempFourbarObject.sketches[0].links[1].points[1].y = _parr[3].y;
+
+    //Coupler1
+    tempFourbarObject.sketches[0].links[2].points[0].x = _parr[2].x; //p1
+    tempFourbarObject.sketches[0].links[2].points[0].y = _parr[2].y;
+    tempFourbarObject.sketches[0].links[2].points[1].x = _parr[3].x; //p2
+    tempFourbarObject.sketches[0].links[2].points[1].y = _parr[3].y;
+
+    //Coupler2
+    tempFourbarObject.sketches[0].links[3].points[0].x = _parr[2].x; //p1
+    tempFourbarObject.sketches[0].links[3].points[0].y = _parr[2].y;
+    tempFourbarObject.sketches[0].links[3].points[1].x = _parr[4].x; //p3
+    tempFourbarObject.sketches[0].links[3].points[1].y = _parr[4].y;
+
+    //Coupler3
+    tempFourbarObject.sketches[0].links[4].points[0].x = _parr[4].x; //p3
+    tempFourbarObject.sketches[0].links[4].points[0].y = _parr[4].y;
+    tempFourbarObject.sketches[0].links[4].points[1].x = _parr[3].x; //p2
+    tempFourbarObject.sketches[0].links[4].points[1].y = _parr[3].y;
+
+    tempFourbarObject.sketches[0].motors[0].phase = _motorPhase;
+    tempFourbarObject.sketches[0].motors[0].direction = _dir;
+
+    loadJSON(tempFourbarObject, true);
+}
+
+function getTrj(){
+		try360forAssemblies();
+		var _sampleSize = WATT_SAMPLE_SIZE;
+
+		if(currentAssemblyGroup.optimizedPath.getTrajectory() == null){
+	        showSnackBar("최적화 목적 궤적 없음", "No target trajectory to optimize");
+	        return;
+	    }
+
+	    //var positionTrj = resample(currentAssemblyGroup.getTrajectory().get(0).getTrajectory(), _sampleSize); // base position
+		var positionTrj = resample(currentAssemblyGroup.optimizedPath.getTrajectory(), _sampleSize); // base position
+	   	_trjData = normalizeTrj(positionTrj);
+		tempTrj = _trjData.trajectory;
+
+		console.log(JSON.stringify(tempTrj));
+}
+
+function findCenterPosition(_trj){
+  var _xMean = 0;
+  var _yMean = 0;
+
+  for (var i in _trj.array){
+      _xMean = _xMean + _trj.get(i).x;
+      _yMean = _yMean + _trj.get(i).y;
+  }
+  _xMean = _xMean / _trj.length();
+  _yMean = _yMean / _trj.length();
+
+  return {x: _xMean, y: _yMean};
+}
+
+function reOrderArray(_arr){
+  var _returnArray = [];
+
+  var _yMax = 0;
+  var _maxIndex = -1;
+  for(var i=0; i<_arr.length; i++){
+      if(_arr[i].y > _yMax){
+          _yMax = _arr[i].y;
+          _maxIndex = i;
+      }
+  }
+
+  if(_maxIndex == 0){
+      _returnArray = _arr;
+  }
+  else{
+      var _arrFront = _arr.slice(0, _maxIndex);
+      var _arrEnd = _arr.slice(_maxIndex, _arr.length);
+
+      _returnArray = _arrEnd.concat(_arrFront);
+  }
+
+  return _returnArray;
+}
+
+
+var emptyWattTrj = [];
+function makeWattSet(_start, _end){
+  var START_COUNT_FILE = _start;
+  var END_COUNT_FILE = _end;
+
+  console.log("START FROM: " + START_COUNT_FILE);
+  console.log("END AT: " + END_COUNT_FILE);
+
+  // array of a1, a2, p1, p2, p3, r1, r2
+  // sample
+  //_parr = [{x: 0.00, y: 0.00}, {x: 101.60, y: 0.00}, {x: 0.00, y: 38.10}, {x: 101.60, y: 76.20}, {x: 50.80, y: 50.80}, {x: 101.60, y: 0.00}, {x: 76.20, y: 25.40}]
+
+  // starting point
+  var _a1 = {x: 0, y: 0};
+  var _a2 = {x: 50, y: 0};
+  var _p1 = {x: 0, y: 25};
+  var _p2 = {x: 50, y: 50};
+  var _p3 = {x: 25, y: 25};
+  var _c1 = {x: 50, y: 0};
+  var _c2 = {x: 40, y: 15};
+
+  var _count=0;
+
+  // p1.y
+  for(var p1y=0; p1y<=10; p1y+=10){
+    // c1.y
+    //for(var c1y=-_ANGLE_MAX; c1y<_ANGLE_MAX; c1y+=_STEP*2){
+      // p3.x, p3.y
+      for(var _r=30; _r<=50; _r+=10){
+          for(var _angle=0; _angle<(2*Math.PI); _angle+=(Math.PI/16)){
+              var p3x = _r*Math.cos(_angle);
+              var p3y = _r*Math.sin(_angle);
+              // c2.x
+              for(var _r2=60; _r2<=80; _r2+=10){
+                  for(var _angle2=0; _angle2<(2*Math.PI); _angle2+=(Math.PI/16)){
+                      var c2x = _r2*Math.cos(_angle2);
+                      var c2y = _r2*Math.sin(_angle2);
+
+
+                      _a1t = {x: _a1.x,           y: _a1.y       };
+                      _a2t = {x: _a2.x,           y: _a2.y       };
+                      _p1t = {x: _p1.x,           y: _p1.y + p1y };
+                      _p2t = {x: _a2t.x,          y: _p2.y       };
+                      _c1t = {x: _a2t.x,          y: _c1.y       };
+
+                      _p3t = {x: (_p1t.x+_p2t.x)/2 + p3x,   y: (_p1t.y+_p2t.y)/2 + p3y};
+                      _c2t = {x: (_c1t.x+_p3t.x)/2 + c2x,   y: (_c1t.y+_p3t.y)/2 + c2y};
+
+                      _parr = [_a1t, _a2t, _p1t, _p2t, _p3t, _c1t, _c2t];
+
+                      for(var i=0; i<8; i++){
+
+                          // ================== EDITED
+
+                          if(_count>=START_COUNT_FILE && _count<END_COUNT_FILE){
+                              generateWatt(emptyWattTrj, _parr, 0, ((2*Math.PI)/8)*i);
+                              generateWatt(emptyWattTrj, _parr, 1, ((2*Math.PI)/8)*i); //reverse
+                          }
+                          _count++;
+                      }
+
+                      if(_count>=START_COUNT_FILE && _count<END_COUNT_FILE){
+                          var _text = "[";
+                          for(var i=START_COUNT_FILE; i<END_COUNT_FILE; i+=((END_COUNT_FILE-START_COUNT_FILE)/20)){
+                              if(i<_count){
+                                  _text += "■";
+                              }else{
+                                  _text += "□";
+                              }
+                          }
+                          _text += "] " + parseInt(((_count-START_COUNT_FILE)/(END_COUNT_FILE-START_COUNT_FILE))*100) +"%";
+                          console.log(_text);
+                      }
+                      //console.log("Training: " + emptyWattTrj.length);
+                  }
+              }
+          }
+      }
+    //}
+  }
+
+
+  console.log("total Count: " + _count);
+  console.log("Generated Samples: " + emptyWattTrj.length);
+
+  var _generatedData = "";
+  for(i=0; i<emptyWattTrj.length; i++){
+      _generatedData += JSON.stringify(emptyWattTrj[i]) + "\r\n";
+  }
+  saveAsText("WattDataSet"+START_COUNT_FILE+"_"+END_COUNT_FILE+"_"+(emptyWattTrj.length)+".txt", _generatedData);
+
+  makeNewFile();
+}
+
+// generate and save watt;
+function generateWatt(_dataSet, _parr, _dir, _angle){
+    //a1: anchor point for crank (driver)
+    //a2: anchor point for rocker
+    //p1: end point of crank
+    //p2: end point of rocker
+    //p3: end point of coupler (triangle)
+    //r1: end point of watt rocker
+    //r2: link point between r1 and p3
+    //actual movement: link between r2 and p3
+
+    // array of a1, a2, p1, p2, p3, r1, r2
+    // sample
+    //_parr = [{x: 0.00, y: 0.00}, {x: 101.60, y: 0.00}, {x: 0.00, y: 38.10}, {x: 101.60, y: 76.20}, {x: 50.80, y: 50.80}, {x: 101.60, y: 0.00}, {x: 76.20, y: 25.40}]
+
+    if(_angle!=0){
+        var _rotatedPArr = [];
+        for(var i=0; i<_parr.length; i++){
+            _rotatedPArr.push(rotateFromOrigin(_parr[i], _angle));
+        }
+        _parr = _rotatedPArr;
+    }
+
+    drawWatt_generate(_parr, _dir, _angle, 0);
+
+    // break test
+    var isBroken = false;
+    if(currentAssemblyGroup.try360() == Number.POSITIVE_INFINITY){
+        isBroken = true;
+        return false; // stop here for broken linkages
+    }
+    if(currentAssemblyGroup.assembly.getUnspecified().length()>0) return false;
+
+    // get trajectories
+    var _sampleSize = WATT_SAMPLE_SIZE;
+    var positionTrj = resample(currentAssemblyGroup.getTrajectory().get(0).getTrajectory(), _sampleSize); // base position
+    var handleTrj = resample(currentAssemblyGroup.getTrajectory().get(1).getTrajectory(), _sampleSize); // handle position
+    var targetTrj = resample(currentAssemblyGroup.getTrajectory().get(2).getTrajectory(), _sampleSize); // target position
+
+    if(isNaN(handleTrj[0].x)) return false;
+
+    var _trjData = normalizeTrj(targetTrj);
+
+    // get angles
+    var angleArrays = getAngleVariation(positionTrj, handleTrj);
+    var _angleData = normalizeAngle(angleArrays);
+
+    _dataSet.push({points: _parr,
+                    trajectory: _trjData.trajectory,
+                    angle: _angleData.angle,
+                    width: _trjData.width,
+                    dx: _trjData.dx,
+                    dy: _trjData.dy,
+                    da: _angleData.da,
+                    dir: _dir
+                });
+}
+
+var emptyFourbarTrj = [];
+function makeFourbarSet(_start, _end){
+  var START_COUNT_FILE = _start;
+  var END_COUNT_FILE = _end;
+
+  console.log("START FROM: " + START_COUNT_FILE);
+  console.log("END AT: " + END_COUNT_FILE);
+
+  // array of a1, a2, p1, p2, p3
+  // sample
+  //_parr = [{x: 0.00, y: 0.00}, {x: 101.60, y: 0.00}, {x: 0.00, y: 38.10}, {x: 101.60, y: 76.20}, {x: 50.80, y: 50.80}]
+
+  // starting point
+  var _a1 = {x: 0, y: 0};
+  var _a2 = {x: 50, y: 0};
+  var _p1 = {x: 0, y: 25};
+  var _p2 = {x: 50, y: 50};
+  var _p3 = {x: 25, y: 25};
+
+  var _count=0;
+    // p3.x, p3.y
+    for(var _r=30; _r<=50; _r+=20){
+        for(var _angle=0; _angle<(2*Math.PI); _angle+=(Math.PI/16)){
+            var p3x = _r*Math.cos(_angle);
+            var p3y = _r*Math.sin(_angle);
+
+                _a1t = {x: _a1.x,           y: _a1.y       };
+                _a2t = {x: _a2.x,           y: _a2.y       };
+                _p1t = {x: _p1.x,           y: _p1.y       };
+                _p2t = {x: _a2t.x,          y: _p2.y       };
+                _p3t = {x: (_p1t.x+_p2t.x)/2 + p3x,   y: (_p1t.y+_p2t.y)/2 + p3y};
+
+                _parr = [_a1t, _a2t, _p1t, _p2t, _p3t];
+
+                for(var i=0; i<8; i++){
+
+                    if(_count>=START_COUNT_FILE && _count<END_COUNT_FILE){
+                        generateFourbar(emptyFourbarTrj, _parr, 0, ((2*Math.PI)/8)*i);
+                        generateFourbar(emptyFourbarTrj, _parr, 1, ((2*Math.PI)/8)*i); //reverse
+                    }
+                    _count++;
+                }
+
+                if(_count>=START_COUNT_FILE && _count<END_COUNT_FILE){
+                    var _text = "[";
+                    for(var i=START_COUNT_FILE; i<END_COUNT_FILE; i+=((END_COUNT_FILE-START_COUNT_FILE)/20)){
+                        if(i<_count){
+                            _text += "■";
+                        }else{
+                            _text += "□";
+                        }
+                    }
+                    _text += "] " + parseInt(((_count-START_COUNT_FILE)/(END_COUNT_FILE-START_COUNT_FILE))*100) +"%";
+                    console.log(_text);
+                }
+                //console.log("Training: " + emptyFourbarTrj.length);
+            }
+        }
+
+  console.log("total Count: " + _count);
+  console.log("Generated Samples: " + emptyFourbarTrj.length);
+
+  var _generatedData = "";
+  for(i=0; i<emptyFourbarTrj.length; i++){
+      _generatedData += JSON.stringify(emptyFourbarTrj[i]) + "\r\n";
+  }
+  saveAsText("FourbarDataSet"+START_COUNT_FILE+"_"+END_COUNT_FILE+"_"+(emptyFourbarTrj.length)+".txt", _generatedData);
+
+  makeNewFile();
+}
+
+// generate and save watt;
+function generateFourbar(_dataSet, _parr, _dir, _angle){
+    //a1: anchor point for crank (driver)
+    //a2: anchor point for rocker
+    //p1: end point of crank
+    //p2: end point of rocker
+    //p3: end point of coupler (triangle)
+
+    // array of a1, a2, p1, p2, p3,
+    // sample
+    //_parr = [{x: 0.00, y: 0.00}, {x: 101.60, y: 0.00}, {x: 0.00, y: 38.10}, {x: 101.60, y: 76.20}, {x: 50.80, y: 50.80},]
+
+    if(_angle!=0){
+        var _rotatedPArr = [];
+        for(var i=0; i<_parr.length; i++){
+            _rotatedPArr.push(rotateFromOrigin(_parr[i], _angle));
+        }
+        _parr = _rotatedPArr;
+    }
+
+    drawFourbar(_parr, _dir, _angle, 0);
+
+    // break test
+    var isBroken = false;
+    if(currentAssemblyGroup.try360() == Number.POSITIVE_INFINITY){
+        isBroken = true;
+        return false; // stop here for broken linkages
+    }
+    if(currentAssemblyGroup.assembly.getUnspecified().length()>0) return false;
+
+    // get trajectories
+    var _sampleSize = FOURBAR_SAMPLE_SIZE;
+    var positionTrj = resample(currentAssemblyGroup.getTrajectory().get(0).getTrajectory(), _sampleSize); // base position
+
+    var _trjData = normalizeTrj(positionTrj);
+
+    _dataSet.push({points: _parr,
+                    trajectory: _trjData.trajectory,
+                    //angle: _angleData.angle,
+                    width: _trjData.width,
+                    dx: _trjData.dx,
+                    dy: _trjData.dy,
+                    //da: _angleData.da,
+                    dir: _dir
+                });
+}
+
+function rotateFromOrigin(_p, _theta){
+    var _qx = _p.x * Math.cos(_theta) - _p.y * Math.sin(_theta);
+    var _qy = _p.x * Math.sin(_theta) + _p.y * Math.cos(_theta);
+
+    return {x: _qx, y: _qy};
+}
+
+// function for get angle array between two points
+function getAngleVariation(_ptrj, _htrj){
+    var _returnAngles = [];
+
+    for(var i=0; i<_ptrj.length; i++){
+        var _angle = Math.atan2(_htrj[i].y-_ptrj[i].y, _htrj[i].x-_ptrj[i].x);
+
+        if(_angle < 0)  _angle += (2 * Math.PI);
+        _angle = _angle%(2*Math.PI);
+
+        _returnAngles.push(_angle);
+    }
+    return _returnAngles;
+}
+
+  // DTW Prepare
+function normalizeTrj(_data) {
+    // normalize trj with max width 1
+
+    var _returnTrj = [];
+
+    var _xMean = 0;
+    var _yMean = 0;
+    var _xMax = Number.NEGATIVE_INFINITY;
+    var _xMin = Number.POSITIVE_INFINITY;
+
+    for (var i = 0; i < _data.length; i++) {
+        _xMean = _xMean + _data[i].x;
+        _yMean = _yMean + _data[i].y;
+        if(_data[i].x > _xMax) _xMax = _data[i].x;
+        if(_data[i].x < _xMin) _xMin = _data[i].x;
+    }
+    _xMean = _xMean / _data.length;
+    _yMean = _yMean / _data.length;
+
+    var _width = _xMax - _xMin;
+
+    for (var i = 0; i < _data.length; i++) {
+        _returnTrj.push({x: ((_data[i].x - _xMean)/_width).toFixed(4), y: ((_data[i].y - _yMean)/_width).toFixed(4)});
+    }
+    return {trajectory: _returnTrj, width: _width, dx: _xMean, dy: _yMean};
+}
+
+function normalizeAngle(_data) {
+    var _returnAngle = [];
+
+    var _aMean = 0;
+
+    for (var i = 0; i < _data.length; i++) {
+        _aMean = _aMean + _data[i]
+    }
+    _aMean = _aMean / _data.length;
+
+    /*
+    for (var i = 0; i < _data.length; i++) {
+        _returnAngle.push(_data[i] - _aMean);
+    }
+    */
+
+    for (var i = 0; i < _data.length; i++) {
+        _returnAngle.push( (_data[i] - _data[0]).toFixed(4) ); // starting from 0
+    }
+
+    return {angle: _returnAngle, da: _aMean};
+}
+
+// distance function
+function distFuncTrj( a, b ) {
+    var xdiff = a.x - b.x;
+    var ydiff = a.y - b.y;
+
+    var diff = Math.sqrt(xdiff*xdiff + ydiff*ydiff);
+    return diff;
+}
+function distFuncAngle( a, b ) {
+    var adiff = a - b;
+
+    var diff = Math.abs(adiff);
+    return diff;
+}
+
+// DTW library
+( function() {
+    "use strict";
+    function DynamicTimeWarping ( ts1, ts2, distanceFunction ) {
+        var ser1 = ts1;
+        var ser2 = ts2;
+        var distFunc = distanceFunction;
+        var distance;
+        var matrix;
+        var path;
+
+        var getDistance = function() {
+            if ( distance !== undefined ) {
+                return distance;
+            }
+            ;
+            //console.log(ser1)
+            //console.log(ser1.length)
+            //console.log(ser2)
+            //console.log(ser2.length)
+            matrix = [];
+            for ( var i = 0; i < ser1.length; i++ ) {
+                matrix[ i ] = [];
+                for ( var j = 0; j < ser2.length; j++ ) {
+                    var cost = Infinity;
+                    if ( i > 0 ) {
+                        cost = Math.min( cost, matrix[ i - 1 ][ j ] );
+                        if ( j > 0 ) {
+                            cost = Math.min( cost, matrix[ i - 1 ][ j - 1 ] );
+                            cost = Math.min( cost, matrix[ i ][ j - 1 ] );
+                        }
+                    } else {
+                        if ( j > 0 ) {
+                            cost = Math.min( cost, matrix[ i ][ j - 1 ] );
+                        } else {
+                            cost = 0;
+                        }
+                    }
+                    matrix[ i ][ j ] = cost + distFunc( ser1[ i ], ser2[ j ] );
+                }
+            }
+
+            return matrix[ ser1.length - 1 ][ ser2.length - 1 ];
+        };
+
+        this.getDistance = getDistance;
+
+        var getPath = function() {
+            if ( path !== undefined ) {
+                return path;
+            }
+            if ( matrix === undefined ) {
+                getDistance();
+            }
+            var i = ser1.length - 1;
+            var j = ser2.length - 1;
+            path = [ [ i, j ] ];
+            while ( i > 0 || j > 0 ) {
+                if ( i > 0 ) {
+                    if ( j > 0 ) {
+                        if ( matrix[ i - 1 ][ j ] < matrix[ i - 1 ][ j - 1 ] ) {
+                            if ( matrix[ i - 1 ][ j ] < matrix[ i ][ j - 1 ] ) {
+                                path.push( [ i - 1, j ] );
+                                i--;
+                            } else {
+                                path.push( [ i, j - 1 ] );
+                                j--;
+                            }
+                        } else {
+                            if ( matrix[ i - 1 ][ j - 1 ] < matrix[ i ][ j - 1 ] ) {
+                                path.push( [ i - 1, j - 1 ] );
+                                i--;
+                                j--;
+                            } else {
+                                path.push( [ i, j - 1 ] );
+                                j--;
+                            }
+                        }
+                    } else {
+                        path.push( [ i - 1, j ] );
+                        i--;
+                    }
+                } else {
+                    path.push( [ i, j - 1 ] );
+                    j--;
+                }
+            }
+            path = path.reverse();
+
+            return path;
+        };
+
+        this.getPath = getPath;
+    }
+
+    var root = typeof self === "object" && self.self === self && self ||
+        typeof global === "object" && global.global === global && global ||
+        this;
+
+    if ( typeof exports !== "undefined" && !exports.nodeType ) {
+        if ( typeof module !== "undefined" && !module.nodeType && module.exports ) {
+            exports = module.exports = DynamicTimeWarping;
+        }
+        exports.DynamicTimeWarping = DynamicTimeWarping;
+    } else {
+        root.DynamicTimeWarping = DynamicTimeWarping;
+    }
+
+    if ( typeof define === "function" && define.amd ) {
+        define( "dynamic-time-warping", [], function() {
+            return DynamicTimeWarping;
+        } );
+    }
+  }() );
+
+
+</script>

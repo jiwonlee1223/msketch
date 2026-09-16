@@ -1,0 +1,253 @@
+<div class="msketch-panel-container" id="panel_analysis" style="display: none">
+    <div class="msketch-panel-title">Walking Path<br>Analysis</div>
+
+    <div class="msketch-panel-row">
+        <img src="./public/res/desAnalysis.png" style="width: 100%; padding: 16px; background-color: #fff; border-radius: 5px">
+    </div>
+
+    <div class="msketch-panel-row">
+          <div class="msketch-panel-desc">Analyze strides with marked points on designed mechanism. Movement for analysis is not affected by motor setting.</div>
+    </div>
+
+    <div class="msketch-panel-row">
+        <button class="msketch-panel-btn-large" id="panel_analysis_run"><i class="material-icons">done</i>Run</button>
+        <button class="msketch-panel-btn-large" id="panel_analysis_stop"><i class="material-icons">stop</i>Stop</button>
+    </div>
+    <hr>
+    <div class="msketch-panel-row">
+        <div class="panel-analysis-result-container header">
+            <div class="msketch-panel-desc" style="width: 15%;">Color</div>
+            <div class="msketch-panel-desc" style="width: 40%;">Ground Length</div>
+            <div class="msketch-panel-desc" style="width: 40%;">Angle Coefficient</div>
+        </div>
+        <div id="panel_analysis_result"></div>
+    </div>
+</div>
+
+<style>
+.panel-analysis-result-container > div {
+    display: inline-block;
+    font-size: 13px;
+    margin-bottom: 6px;
+    vertical-align: middle;
+    float: left;
+}
+.panel-analysis-result-container.header > div{
+    font-weight: 700;
+    color: #555;
+}
+.panel-analysis-bullet{
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #888;
+}
+</style>
+
+<script>
+    var TRAJECTORY_COLORS = ['#671eac', '#E94F35', '#2ACA6B', '#F4C300', '#438CDE'];
+    var TRAJECTORY_COLORS_THREE = [0x671eac, 0xE94F35, 0x2ACA6B, 0xF4C300, 0x438CDE];
+
+    $('#panel_analysis_run').click( function(){
+        runAnalysis();
+        showMessage("Analysis started.");
+    });
+    $('#panel_analysis_stop').click( function(){
+        stopAnalysis();
+        showMessage("Analysis stopped.");
+    });
+
+
+    function getAnalysisInfo(){ // called in main.js actuate();
+    	if(!isAnalysisOn) return;
+
+    	var tCount = 0;
+
+        $('#panel_analysis_result').empty();
+
+    	for(i=0; i<AssemblyGroupList.length; i++){
+    		var _trajectoryList = AssemblyGroupList[i].getTrajectory();
+    		if(_trajectoryList==null) return;
+    		for(var ti in _trajectoryList.array){
+    			var t = _trajectoryList.get(ti);
+
+    			AssemblyGroupList[i].trajectoryObjList[ti].setColor(TRAJECTORY_COLORS_THREE[tCount%TRAJECTORY_COLORS_THREE.length]);
+
+                $('#panel_analysis_result').append('<div class="panel-analysis-result-container">'
+                    + '<div class="msketch-panel-desc" style="width: 15%;"><div class="panel-analysis-bullet" style="background-color: ' + TRAJECTORY_COLORS[tCount%TRAJECTORY_COLORS.length] + '"></div></div>'
+                    + '<div class="msketch-panel-desc" style="width: 40%;">' + (parseFloat(groundInfo(t)[0])*SCALE_TRANS).toFixed(3)     + ' mm </div>'
+                    + '<div class="msketch-panel-desc" style="width: 40%;">' + parseFloat(groundInfo(t)[1]).toFixed(3)                   + '</div></div>'
+                )
+
+    			tCount++;
+    		}
+    	}
+    }
+
+    function runAnalysis(){
+    	if(isPlaying){
+    		interfaceSelect(TOOL_RUN);
+    	}
+    	isAnalysisOn = true;
+    	interfaceSelect(TOOL_RUN);
+    }
+    function stopAnalysis(){
+    	isAnalysisOn = false;
+    	if(isPlaying){
+    		interfaceSelect(TOOL_RUN);
+    	}
+    }
+
+
+    function groundInfo(_trajectoryObject){
+    	var groundLength;
+    	var groundAngleCo;
+    	var returnValue = new Array();
+
+    	var _tan 	= [];
+    	var _angle 	= [];
+    	var _x 		= [];
+    	var _y 		= [];
+    	//var _pm		= [];	//*	Not used in this version
+
+    	var inputTrajectory = _trajectoryObject.getTrajectoryOneCycle();
+    	//inputTrajectory.splice(0,1);
+
+    	//* Parsing "angle/x/y" from the Trajectory.trajectoryOneCycle [elements/Trajectory.js]
+    	for(var j=0; j<inputTrajectory.length; j++){
+    		var res = inputTrajectory[j].split('/');
+    		_angle.push(res[0]);
+    		_x.push(res[1]);
+    		_y.push(res[2]);
+    	}
+
+    	var tempTan = (_y[2]-_y[1])/(_x[2]-_x[1]);
+
+    	for(var j=0; j<inputTrajectory.length-1; j++){
+    		_tan.push((_y[j+1]-_y[j])/(_x[j+1]-_x[j]));
+
+    		if(tempTan < ( (_y[j+1] - _y[j]) / (_x[j+1] - _x[j]) ) ){
+    			tempTan=(_y[j+1] - _y[j]) / (_x[j+1] - _x[j]);
+    		}
+    	}
+
+
+    	var tempno	= _tan.indexOf(tempTan);
+    	var tanup 	= _tan.slice(0,tempno);
+    	var tandown = _tan.slice(tempno,_tan.length+1);
+    	var newtan 	= tandown.concat(tanup);
+
+    	var aup 	= _angle.slice(0,tempno);
+    	var adown 	= _angle.slice(tempno,_angle.length+1);
+    	var newa 	= adown.concat(aup);
+
+    	var xup 	= _x.slice(0,tempno);
+    	var xdown 	= _x.slice(tempno,_x.length+1);
+    	var newx 	= xdown.concat(xup);
+
+    	var yup 	= _y.slice(0,tempno);
+    	var ydown 	= _y.slice(tempno,_y.length+1);
+    	var newy 	= ydown.concat(yup);
+
+    	/*	Not used in this version
+    	for(var j=0; j<_tan.length-1; j++){
+    		_pm.push((_tan[j+1]-_tan[j])/(_x[j+2]-_x[j]));
+    	}
+    	*/
+
+    	//var start;
+    	//var stop;
+    	var part	= [];
+    	var arrno	= 0;
+    	var countt	= 0;
+
+    	for(var j=1; j<newtan.length-1; j++){
+    		if(Math.abs(newtan[j])<0.2679){
+    			if(countt==0){
+    				var tt=[];
+    				part.push(tt);
+    				countt++;
+    			}
+    			part[arrno].push(j);
+    		}else{
+    			if(countt!=0){
+    				countt=0;
+    				arrno++;
+    			}
+    		}
+    	}
+
+    	var yval=[];
+
+    	for(var qq=0; qq<part.length; qq++){
+    		var ytemp=newy[part[qq][0]];
+    		for(var pp=1; pp<part[qq].length; pp++){
+    			if(ytemp<newy[part[qq][pp]]){
+    				ytemp=newy[part[qq][pp]];
+    			}
+    		}
+    		yval.push(ytemp);
+    	}
+
+    	var minval		= Math.min.apply(null, yval);
+    	var minindex	= yval.indexOf(minval.toString());
+    	var lengthtemp	= 0.0;
+
+    	if(part[minindex]!=null){
+    		for(var c=0; c<part[minindex].length-1; c++){
+    			var tempxx1	= newx[part[minindex][c]];
+    			tempxx1*=1;
+
+    			var tempxx2	= newx[part[minindex][c+1]];
+    			tempxx2*=1;
+
+    			var tempyy1 = newy[part[minindex][c]];
+    			tempyy1*=1;
+
+    			var tempyy2 = newy[part[minindex][c+1]];
+    			tempyy2*=1;
+
+    			var tempxx=(tempxx1-tempxx2);
+    			//var tempyy=(tempyy1-tempyy2);
+    			//var sum = (tempxx*tempxx)+(tempyy*tempyy);
+    			//sum = Math.sqrt(sum);
+    			lengthtemp+=tempxx;
+    		}
+    	}
+
+    	//======================== OUTPUT 1: Ground Length ===============================
+    	groundLength = Math.abs(lengthtemp); // groundLength = lengthtemp;
+    	//================================================================================
+
+    	var temp_angle=[];
+    	var angletemp=[];
+    	var temp_angleOut = 0;
+
+    	if(part[minindex]!=null){
+    		for(var d=0;d<part[minindex].length;d++){
+    			var temp_angle1=newa[part[minindex][d]];
+    			temp_angle1*=1;
+    			temp_angle.push(temp_angle1);
+    		}
+    	}
+
+    	if(temp_angle.length>0){
+    		temp_angleOut=(temp_angle[temp_angle.length-1]-temp_angle[0]);
+
+    		if(temp_angleOut<0){
+    			temp_angleOut+=2*Math.PI;
+    		}
+    	}
+    	var angletemp=temp_angleOut/(2*Math.PI);
+
+    	//==================== OUTPUT 2: Ground Angle Coefficient ========================
+    	groundAngleCo=angletemp;
+    	//================================================================================
+
+    	returnValue.push(groundLength);
+    	returnValue.push(groundAngleCo);
+
+    	return returnValue;
+    }
+
+</script>

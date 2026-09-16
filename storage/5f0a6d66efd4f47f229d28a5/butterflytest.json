@@ -1,0 +1,513 @@
+{
+	"app": "EDISON",
+	"type": "Assembly",
+	"fileVersion": "2.0",
+	"description": "Saved From M.Sketch v3.0",
+	"thickness": 5,
+	"holeSize": 4,
+	"linkWidth": 12.7,
+	"sketches": [
+		{
+			"plane": {
+				"name": "Plane0",
+				"translation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "0.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "-22.89",
+						"y": "56.01",
+						"z": "0.00"
+					},
+					{
+						"x": "-46.71",
+						"y": "56.01",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Crank*",
+					"points": [
+						{
+							"x": "-22.89",
+							"y": "56.01",
+							"z": "0.00"
+						},
+						{
+							"x": "-22.89",
+							"y": "44.10",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Rocker*",
+					"points": [
+						{
+							"x": "-46.71",
+							"y": "56.01",
+							"z": "0.00"
+						},
+						{
+							"x": "-46.71",
+							"y": "32.19",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Coupler1*",
+					"points": [
+						{
+							"x": "-22.89",
+							"y": "44.10",
+							"z": "0.00"
+						},
+						{
+							"x": "-46.71",
+							"y": "32.19",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Coupler2*",
+					"points": [
+						{
+							"x": "-22.89",
+							"y": "44.10",
+							"z": "0.00"
+						},
+						{
+							"x": "-54.60",
+							"y": "24.91",
+							"z": "0.00"
+						},
+						{
+							"x": "-77.27",
+							"y": "20.99",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Coupler3*",
+					"points": [
+						{
+							"x": "-54.60",
+							"y": "24.91",
+							"z": "0.00"
+						},
+						{
+							"x": "-46.71",
+							"y": "32.19",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link1",
+					"points": [
+						{
+							"x": "-77.27",
+							"y": "20.99",
+							"z": "0.00"
+						},
+						{
+							"x": "-76.42",
+							"y": "10.88",
+							"z": "0.00"
+						},
+						{
+							"x": "-13.13",
+							"y": "12.30",
+							"z": "0.00"
+						},
+						{
+							"x": "-71.55",
+							"y": "-35.24",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint1*",
+					"points": [
+						{
+							"targetLink": "Crank*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint2*",
+					"points": [
+						{
+							"targetLink": "Rocker*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint5*",
+					"points": [
+						{
+							"targetLink": "Coupler2*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Crank*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Coupler1*",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint6*",
+					"points": [
+						{
+							"targetLink": "Coupler3*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Coupler2*",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint7*",
+					"points": [
+						{
+							"targetLink": "Rocker*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Coupler3*",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Coupler1*",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint1",
+					"points": [
+						{
+							"targetLink": "Link1",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Coupler2*",
+							"targetIndex": 2
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [
+				{
+					"targetLink": "Coupler2*",
+					"targetIndex": 1
+				}
+			],
+			"motors": [
+				{
+					"name": "Motor1",
+					"targetConstraint": "CoaxialConstraint1*",
+					"targetLink1": "Crank*",
+					"targetLink2": "Anchor",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 146,
+					"range": "0-180"
+				}
+			]
+		},
+		{
+			"plane": {
+				"name": "Plane1",
+				"translation": {
+					"x": "-31.79",
+					"y": "0.00",
+					"z": "-22.52"
+				},
+				"rotation": {
+					"x": "0.00",
+					"y": "360.00",
+					"z": "0.00"
+				}
+			},
+			"anchor": {
+				"points": [
+					{
+						"x": "-22.89",
+						"y": "56.01",
+						"z": "0.00"
+					},
+					{
+						"x": "-46.71",
+						"y": "56.01",
+						"z": "0.00"
+					},
+					{
+						"x": "-38.87",
+						"y": "14.70",
+						"z": "0.00"
+					},
+					{
+						"x": "-95.43",
+						"y": "-37.97",
+						"z": "0.00"
+					}
+				]
+			},
+			"links": [
+				{
+					"name": "Crank**",
+					"points": [
+						{
+							"x": "-22.89",
+							"y": "56.01",
+							"z": "0.00"
+						},
+						{
+							"x": "-22.89",
+							"y": "44.10",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Rocker**",
+					"points": [
+						{
+							"x": "-46.71",
+							"y": "56.01",
+							"z": "0.00"
+						},
+						{
+							"x": "-46.71",
+							"y": "32.19",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Coupler1**",
+					"points": [
+						{
+							"x": "-22.89",
+							"y": "44.10",
+							"z": "0.00"
+						},
+						{
+							"x": "-46.71",
+							"y": "32.19",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Coupler2**",
+					"points": [
+						{
+							"x": "-22.89",
+							"y": "44.10",
+							"z": "0.00"
+						},
+						{
+							"x": "-54.60",
+							"y": "24.91",
+							"z": "0.00"
+						},
+						{
+							"x": "-77.27",
+							"y": "20.99",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Coupler3**",
+					"points": [
+						{
+							"x": "-54.60",
+							"y": "24.91",
+							"z": "0.00"
+						},
+						{
+							"x": "-46.71",
+							"y": "32.19",
+							"z": "0.00"
+						}
+					]
+				},
+				{
+					"name": "Link1*",
+					"points": [
+						{
+							"x": "-77.27",
+							"y": "20.99",
+							"z": "0.00"
+						},
+						{
+							"x": "-114.78",
+							"y": "26.85",
+							"z": "0.00"
+						},
+						{
+							"x": "-70.94",
+							"y": "14.42",
+							"z": "0.00"
+						},
+						{
+							"x": "-121.27",
+							"y": "-27.93",
+							"z": "0.00"
+						}
+					]
+				}
+			],
+			"constraints": [
+				{
+					"name": "CoaxialConstraint1**",
+					"points": [
+						{
+							"targetLink": "Crank**",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint2**",
+					"points": [
+						{
+							"targetLink": "Rocker**",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Anchor",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint5**",
+					"points": [
+						{
+							"targetLink": "Coupler2**",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Crank**",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Coupler1**",
+							"targetIndex": 0
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint6**",
+					"points": [
+						{
+							"targetLink": "Coupler3**",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Coupler2**",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint7**",
+					"points": [
+						{
+							"targetLink": "Rocker**",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Coupler3**",
+							"targetIndex": 1
+						},
+						{
+							"targetLink": "Coupler1**",
+							"targetIndex": 1
+						}
+					]
+				},
+				{
+					"name": "CoaxialConstraint1*",
+					"points": [
+						{
+							"targetLink": "Link1*",
+							"targetIndex": 0
+						},
+						{
+							"targetLink": "Coupler2**",
+							"targetIndex": 2
+						}
+					]
+				}
+			],
+			"sliders": [],
+			"markers": [
+				{
+					"targetLink": "Coupler2**",
+					"targetIndex": 1
+				},
+				{
+					"targetLink": "Coupler2**",
+					"targetIndex": 2
+				}
+			],
+			"motors": [
+				{
+					"name": "Motor1",
+					"targetConstraint": "CoaxialConstraint1**",
+					"targetLink1": "Crank**",
+					"targetLink2": "Anchor",
+					"type": "DC",
+					"direction": 0,
+					"speed": 100,
+					"phase": 43,
+					"range": "0-180"
+				}
+			]
+		}
+	]
+}

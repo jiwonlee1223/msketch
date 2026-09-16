@@ -1,0 +1,95 @@
+<div class="msketch-panel-container" id="panel_load" style="display: none">
+    <div class="msketch-panel-title">Load<br>Setting</div>
+
+    <div class="msketch-panel-row">
+        <button class="msketch-panel-btn" id="btn_addload" onclick="interfaceSelect(TOOL_ADDLOAD);" data-tooltip="Add Load"><i class="material-icons">add_circle_outline</i></button>
+        <div class="msketch-panel-btn-text">Add</div>
+        <button class="msketch-panel-btn" id="btn_editload" onclick="interfaceSelect(TOOL_EDITLOAD);" data-tooltip="Edit Load"><i class="material-icons">edit</i></button>
+        <div class="msketch-panel-btn-text">Edit</div>
+        <button class="msketch-panel-btn" id="btn_removeload" onclick="interfaceSelect(TOOL_REMOVELOAD);" data-tooltip="Remove Load"><i class="material-icons">remove_circle_outline</i></button>
+        <div class="msketch-panel-btn-text">Remove</div>
+    </div>
+
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="Fx [N]" style="width: 49%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_load_valueX" disabled>
+        </div>
+        <div class="msketch-panel-label" data-label="Fy [N]" style="width: 49%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_load_valueY" disabled>
+        </div>
+    </div>
+
+    <button class="msketch-panel-btn-large" id="panel_load_apply"><i class="material-icons">done</i>Apply</button>
+    <button class="msketch-panel-btn-large" id="panel_load_download"><i class="material-icons">file_download</i>Download Load Data</button>
+</div>
+
+
+<script>
+    // === Load Panel ===
+    $('#btn_addload').click(function(){
+        $('#panel_load_valueX').prop('disabled', true);
+        $('#panel_load_valueY').prop('disabled', true);
+    });
+    $('#btn_removeload').click(function(){
+        $('#panel_load_valueX').prop('disabled', true);
+        $('#panel_load_valueY').prop('disabled', true);
+    });
+
+    $('#panel_load_apply').click( function(){
+        applyLoad();
+    });
+
+    $('#panel_load').keyup(function(event){
+        if (event.keyCode == 13) {
+            applyLoad();
+        }
+    });
+
+    $('#panel_load_download').click( function(){
+        downloadLoadData();
+    });
+
+
+
+    var prevPosition 	= [];
+    var prevPointPair 	= null;
+
+    function getLoadInfoToLoadPanel(_valueX , _valueY){
+      if(!(toolState==TOOL_EDITLOAD)) return;
+        $('#panel_load_valueX').prop('disabled', false);
+        $('#panel_load_valueX').val(_valueX);
+        $('#panel_load_valueY').prop('disabled', false);
+        $('#panel_load_valueY').val(_valueY);
+    }
+
+    function applyLoad(){
+      if(!(toolState==TOOL_EDITLOAD)) return;
+      var newLoadValX = parseFloat($('#panel_load_valueX').val());
+      var newLoadValY = parseFloat($('#panel_load_valueY').val());
+      currentAssemblyGroup.loadList.get(loadIndex).setLoadX(newLoadValX);
+      currentAssemblyGroup.loadList.get(loadIndex).setLoadY(newLoadValY);
+      currentAssemblyGroup.load();
+      try360forAssemblies();
+    }
+
+    function downloadLoadData(){
+      var dataOut = JSON.parse(getMsketchInfoForPlane());
+
+      var loadData = [];
+      for(var i=0; i<currentAssemblyGroup.loadList.length(); i++){
+          var tempLoads = {};
+          tempLoads.x = (currentAssemblyGroup.loadList.get(i).getGlobalPosition().x*SCALE_TRANS).toFixed(2);
+          tempLoads.y = (currentAssemblyGroup.loadList.get(i).getGlobalPosition().y*SCALE_TRANS).toFixed(2);
+          tempLoads.loadX = currentAssemblyGroup.loadList.get(i).getLoadX();
+          tempLoads.loadY = currentAssemblyGroup.loadList.get(i).getLoadY();
+          loadData.push(tempLoads);
+      }
+
+      dataOut.sketch.loads =  loadData;
+
+      dataOut = JSON.stringify(dataOut, null, '\t');
+
+	  saveAsText($('#msketch-titlebar-filename').val()+"_Load"+findCurrentAssemblyNum()+".json", dataOut);
+    }
+
+</script>

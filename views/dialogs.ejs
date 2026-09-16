@@ -1,0 +1,347 @@
+<div class="msketch-dialog" id="dialog_newFile">
+    <div class="msketch-dialog-box">
+        <div class="msketch-dialog-header">New File</div>
+        <div class="msketch-dialog-text">Remove all current assemblies and create new file.</div>
+        <button class="msketch-dialog-btn" id="dialog_newFile_ok">OK</button>
+        <button class="msketch-dialog-btn" onclick="$('#dialog_newFile').hide();">Cancel</button>
+    </div>
+</div>
+
+<div class="msketch-dialog" id="dialog_newFile">
+    <div class="msketch-dialog-box">
+        <div class="msketch-dialog-header">New File</div>
+        <div class="msketch-dialog-text">Remove all current assemblies and create new file.</div>
+        <button class="msketch-dialog-btn" id="dialog_newFile_ok">OK</button>
+        <button class="msketch-dialog-btn" onclick="$('#dialog_newFile').hide();">Cancel</button>
+    </div>
+</div>
+
+<div class="msketch-dialog" id="dialog_openFile">
+    <div class="msketch-dialog-box" style="width: 600px">
+        <div class="msketch-dialog-header">Open File</div>
+        <div class="msketch-dialog-text">Remove all assemblies and open existing file.</div>
+        <div style="float: right;">
+            <button class="msketch-toolbar-btn" id="dialog_openFile_download" data-tooltip="Download"><i class="material-icons">cloud_download</i></button>
+            <button class="msketch-toolbar-btn" id="dialog_openFile_upload" data-tooltip="Upload"><i class="material-icons">cloud_upload</i></button>
+            <button class="msketch-toolbar-btn" id="dialog_openFile_rename" data-tooltip="Rename" style="display: none"><i class="material-icons">title</i></button>
+            <button class="msketch-toolbar-btn" id="dialog_openFile_delete" data-tooltip="Delete"><i class="material-icons">delete</i></button>
+        </div>
+
+        <select id="dialog_fileList" class="form-select msketch-dialog-select" name='files' size='10'>
+        </select>
+
+        <button class="msketch-dialog-btn" id="dialog_openFile_ok">OK</button>
+        <button class="msketch-dialog-btn" onclick="$('#dialog_openFile').hide();">Cancel</button>
+    </div>
+</div>
+
+<div class="msketch-dialog" id="dialog_uploadFile">
+    <div class="msketch-dialog-box">
+        <div class="msketch-dialog-header">Upload File</div>
+        <div class="msketch-dialog-text">File Uploader</div>
+
+        <input type=file id="dialog_uploadFile_file" class="form-input msketch-panel-input" />
+
+        <button class="msketch-dialog-btn" id="dialog_uploadFile_ok">OK</button>
+        <button class="msketch-dialog-btn" onclick="$('#dialog_uploadFile').hide();">Cancel</button>
+    </div>
+</div>
+
+<div class="msketch-dialog" id="dialog_importPlane">
+    <div class="msketch-dialog-box">
+        <div class="msketch-dialog-header">Import Plane</div>
+        <div class="msketch-dialog-text">Upload Plane File</div>
+
+        <input type=file id="dialog_importPlane_file" class="form-input msketch-panel-input" />
+
+        <button class="msketch-dialog-btn" id="dialog_importPlane_ok">OK</button>
+        <button class="msketch-dialog-btn" onclick="$('#dialog_importPlane').hide();">Cancel</button>
+    </div>
+</div>
+
+<div class="msketch-dialog" id="dialog_deleteFile">
+    <div class="msketch-dialog-box">
+        <div class="msketch-dialog-header">Delete File</div>
+        <div class="msketch-dialog-text">File will be deleted: </div>
+        <div class="msketch-dialog-text" id="dialog_deleteFile_fileName">Filename</div>
+
+        <button class="msketch-dialog-btn" id="dialog_deleteFile_ok">OK</button>
+        <button class="msketch-dialog-btn" onclick="$('#dialog_deleteFile').hide();">Cancel</button>
+    </div>
+</div>
+
+<div class="msketch-dialog" id="dialog_saveFile">
+    <div class="msketch-dialog-box">
+        <div class="msketch-dialog-header">Save File</div>
+        <div class="msketch-dialog-text">Save file on M.Sketch server.</div>
+        <div class="msketch-panel-label" data-label="File Name" style="width: 100%; margin-bottom: 12px">
+            <input class="form-input msketch-panel-input" type="text" id="dialog_save_filename">
+        </div>
+        <button class="msketch-dialog-btn" id="dialog_save_ok">OK</button>
+        <button class="msketch-dialog-btn" onclick="$('#dialog_saveFile').hide();">Cancel</button>
+    </div>
+</div>
+
+<div class="msketch-dialog" id="dialog_pRemove">
+    <div class="msketch-dialog-box">
+        <div class="msketch-dialog-header">Remove Plane</div>
+        <div class="msketch-dialog-text">Plane will be removed.</div>
+
+        <button class="msketch-dialog-btn" id="dialog_pRemove_ok">OK</button>
+        <button class="msketch-dialog-btn" onclick="$('#dialog_pRemove').hide();">Cancel</button>
+    </div>
+</div>
+
+
+<div id="msketch_fileCache" style="display: none"></div>
+
+<script>
+
+
+    var firstSaved = false;
+    /* for dialog */
+    function showDialog(_id){
+        switch (_id) {
+            case TOOL_NEWFILE:
+                $('#dialog_newFile').show();
+                break;
+            case TOOL_PREMOVE:
+                $('#dialog_pRemove').show();
+                break;
+            case TOOL_SAVE:
+                if(!firstSaved){
+                    $('#dialog_saveFile').show();
+                    $('#dialog_save_filename').val( $('#msketch-titlebar-filename').val() );
+                }else{
+                    saveFileIntoDB( $('#msketch-titlebar-filename').val() )
+                }
+                break;
+            case TOOL_OPEN:
+                $.ajax({
+                    url: '/loadFile',
+                    method: 'post',
+                    data: {},
+                    success: function (data) {
+                        $('#dialog_fileList').empty();
+                        $.each(data.list, function (i, item) {
+                            $('#dialog_fileList').append($('<option>', {
+                                value: item,
+                                text : item
+                            }));
+                        });
+                        //console.log(data.list);
+                    },
+                    error: function (err) {
+                        showMessage("File list load failed");
+                    }
+                });
+                $('#dialog_openFile').show();
+                break;
+            case TOOL_IMPORT:
+                $('#dialog_importPlane').show();
+                break;
+        }
+    }
+
+    $('#dialog_newFile_ok').click(function(){
+        interfaceSelect(TOOL_NEWFILE);
+        $('#dialog_newFile').hide();
+    });
+
+    $('#dialog_pRemove_ok').click(function(){
+        interfaceSelect(TOOL_PREMOVE);
+        $('#dialog_pRemove').hide();
+    });
+
+    // OPEN DIALOG
+    $('#dialog_openFile_ok').click(function(){
+        console.log($('#dialog_fileList').val());
+        if($('#dialog_fileList').val()==null){
+            showMessage("No file selected.")
+        }else{
+            $.ajax({
+                url: '/openFile',
+                method: 'post',
+                data: {fileName: $('#dialog_fileList').val()},
+                success: function (data) {
+                    if(isPlaying)	interfaceSelect(TOOL_RUN);
+                    loadMsketchInfo(data.file, true);
+                    $('#msketch-titlebar-filename').val(data.name.replace(".json", ""));
+                    firstSaved = false;
+                    closeDrawer();
+                },
+                error: function (err) {
+                    showMessage("Open failed");
+                }
+            });
+        }
+
+        $('#dialog_openFile').hide();
+    });
+
+    $('#dialog_openFile_download').click(function(){
+        if($('#dialog_fileList').val()==null){
+            showMessage("No file selected.");
+        }else{
+            $.ajax({
+                url: '/openFile',
+                method: 'post',
+                data: {fileName: $('#dialog_fileList').val()},
+                success: function (data) {
+                    saveAsText(data.name, data.file);
+                    closeDrawer();
+                },
+                error: function (err) {
+                    showMessage("Save failed");
+                }
+            });
+        }
+    });
+
+    $('#dialog_openFile_upload').click(function(){
+        $('#dialog_uploadFile').show();
+    });
+
+    $('#dialog_uploadFile_ok').click(function(){
+        var _file = $('#dialog_uploadFile_file')[0].files[0];
+        var _reader = new FileReader();
+        var _fileName = null;
+    	_reader.addEventListener("load", function() {
+
+            $.ajax({
+                url: '/save',
+                method: 'post',
+                data: {
+                    fileName: _fileName.replace(".json", ""),
+                    file: _reader.result
+                },
+                success: function (data) {
+                    showMessage("File was uploaded.");
+
+                    $.ajax({
+                        url: '/loadFile',
+                        method: 'post',
+                        data: {},
+                        success: function (data) {
+                            $('#dialog_fileList').empty();
+                            $.each(data.list, function (i, item) {
+                                $('#dialog_fileList').append($('<option>', {
+                                    value: item,
+                                    text : item
+                                }));
+                            });
+                            //console.log(data.list);
+                        },
+                        error: function (err) {
+                            showMessage("File list load failed");
+                        }
+                    });
+                },
+                error: function (err) {
+                    showMessage("Save failed");
+                }
+            });
+
+
+    	}, false);
+
+    	if (_file) {
+            _fileName = _file.name;
+    		_reader.readAsText(_file);
+    	}
+
+        $('#dialog_uploadFile').hide();
+    });
+
+
+    $('#dialog_openFile_rename').click(function(){
+
+    });
+
+    $('#dialog_openFile_delete').click(function(){
+        if($('#dialog_fileList').val()==null){
+            showMessage("No file selected.")
+        }else{
+            $('#dialog_deleteFile').show();
+            $('#dialog_deleteFile_fileName').text( $('#dialog_fileList').val() )
+        }
+    });
+
+    $('#dialog_deleteFile_ok').click(function(){
+
+        $.ajax({
+            url: '/deleteFile',
+            method: 'post',
+            data: {fileName: $('#dialog_fileList').val()},
+            success: function (data) {
+                $('#dialog_fileList').empty();
+                $.each(data.list, function (i, item) {
+                    $('#dialog_fileList').append($('<option>', {
+                        value: item,
+                        text : item
+                    }));
+                });
+                $('#dialog_deleteFile').hide();
+            },
+            error: function (err) {
+                showMessage("Delete failed");
+            }
+        });
+    });
+
+    $('#dialog_importPlane_ok').click(function(){
+        var _file = $('#dialog_importPlane_file')[0].files[0];
+        var _reader = new FileReader();
+
+    	_reader.addEventListener("load", function() {
+            var _data = JSON.parse(_reader.result);
+
+            //check header
+        	if(_data.app != "EDISON" || _data.type != "Sketch"){
+        		showMessage("Wrong File");
+        		return null;
+        	}
+
+            loadMsketchInfoForPlane(_data.sketch, true);
+    	}, false);
+
+    	if (_file) {
+    		_reader.readAsText(_file);
+    	}
+
+        $('#dialog_importPlane').hide();
+    })
+
+    //SAVE DIALOG
+
+    $('#dialog_save_ok').click(function(){
+            $('#dialog_saveFile').hide();
+            saveFileIntoDB( $('#dialog_save_filename').val() );
+    });
+
+
+    function saveFileIntoDB(_fileName){
+        if(isPlaying)	interfaceSelect(TOOL_RUN);
+
+        var _fileData = getMsketchInfo();
+
+        $.ajax({
+            url: '/save',
+            method: 'post',
+            data: {
+                fileName: _fileName,
+                file: _fileData
+            },
+            success: function (data) {
+                showMessage("File was saved.");
+                firstSaved = true;
+            },
+            error: function (err) {
+                showMessage("Save failed");
+            }
+        });
+
+        closeDrawer();
+    }
+
+</script>

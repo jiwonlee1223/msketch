@@ -1,0 +1,134 @@
+<div class="msketch-panel-container" id="panel_move" style="display: none">
+    <div class="msketch-panel-title">Point &amp; Link<br>Position</div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="x" style="width: 49%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_move_x" disabled>
+        </div>
+        <div class="msketch-panel-label" data-label="y" style="width: 49%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_move_y" disabled>
+        </div>
+    </div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="Length" style="width: 100%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_move_length" disabled>
+        </div>
+    </div>
+
+    <div class="msketch-panel-row">
+      <label class="form-switch">
+        <input type="checkbox" id="panel_move_sbGrid">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Grid &amp; Snap</span>
+      </label>
+      <label class="form-switch">
+        <input type="checkbox" id="panel_move_sbSnap">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Unit Conversion</span>
+      </label>
+    </div>
+
+    <button class="msketch-panel-btn-large" id="panel_move_apply"><i class="material-icons">done</i>Apply</button>
+</div>
+
+
+<script>
+    // === Postion Panel ===
+    $('#panel_move_sbGrid').on('change', function(){
+        if( $("#panel_move_sbGrid").prop("checked") ){
+            isScienceBoxSanpOn = true;
+    		currentAssemblyGroup.showSBGrid();
+        }else{
+            isScienceBoxSanpOn = false;
+    		currentAssemblyGroup.hideSBGrid();
+        }
+    });
+    $('#panel_move_sbSnap').on('change', function(){
+        if( $("#panel_move_sbSnap").prop("checked") ){
+            isScienceBoxLinkOn = true;
+        }else{
+            isScienceBoxLinkOn = false;
+        }
+    });
+
+    $('#panel_move_apply').click( function(){
+        applyMove();
+		applyLength();
+    });
+
+    $('#panel_move').keyup(function(event){
+        if (event.keyCode == 13) {
+            applyMove();
+    		applyLength();
+        }
+    });
+
+    var prevPosition 	= [];
+    var prevPointPair 	= null;
+
+    function getPointInfoToMovePanel(){
+        if(!(toolState==TOOL_MOVE)) return;
+    	if(selectedPoint!=null){
+            $('#panel_move_x').prop('disabled', false);
+            $('#panel_move_y').prop('disabled', false);
+            $('#panel_move_length').prop('disabled', true);
+
+            $('#panel_move_x').val( (selectedPoint.x*SCALE_TRANS).toFixed(2) );
+            $('#panel_move_y').val( (selectedPoint.y*SCALE_TRANS).toFixed(2) );
+            $('#panel_move_length').val( null );
+
+            prevPosition[0] = selectedPoint.x;
+    		prevPosition[1] = selectedPoint.y;
+    		selectedPoint = null;
+    		prevPointPair = null;
+        }
+
+        // for length
+    	if(selectedPointPair!=null && prevPointPair!=selectedPointPair){
+            $('#panel_move_x').prop('disabled', true);
+            $('#panel_move_y').prop('disabled', true);
+            $('#panel_move_length').prop('disabled', false);
+
+            var _length = selectedPointPair[0].distance(selectedPointPair[1].getX(), selectedPointPair[1].getY());
+
+            $('#panel_move_x').val( null );
+            $('#panel_move_y').val( null );
+            $('#panel_move_length').val( (_length*SCALE_TRANS).toFixed(2) );
+
+    		prevPointPair = selectedPointPair;
+    		selectedPoint = null;
+    		currentAssemblyGroup.setSegmentSelected(selectedLink, selectedPointPair);
+        }
+
+        if(selectedPointTg==null){
+            prevPosition[0] = null;
+    		prevPosition[1] = null;
+    	}
+
+        if(selectedPointPair==null){
+            selectedLink = null;
+    		prevPointPair = null;
+        }
+    }
+
+    function applyMove(){
+    	if(selectedPointTg==null) return;
+
+    	var newPosX = parseFloat($('#panel_move_x').val())/SCALE_TRANS;
+    	var newPosY = parseFloat($('#panel_move_y').val())/SCALE_TRANS;
+    	if(!isNaN(newPosX) && !isNaN(newPosY)){
+    		currentInterface.mouseMove(prevPosition[0], prevPosition[1]);
+    		currentInterface.mouseDown(prevPosition[0], prevPosition[1]);
+    		currentInterface.mouseDownAndMoveFirst(prevPosition[0], prevPosition[1]);
+    		currentInterface.mouseDownAndMove(newPosX, newPosY);
+    		currentInterface.mouseMoveAndUp(newPosX, newPosY);
+    	}
+    }
+
+    function applyLength(){
+    	if(selectedLink==null || selectedPointPair==null) return;
+
+    	var newLength = parseFloat($('#panel_move_length').val())/SCALE_TRANS;
+
+    	setLengthToLink(selectedLink, selectedPointPair[0], selectedPointPair[1], newLength);
+    	currentAssemblyGroup.setSegmentSelected(selectedLink, selectedPointPair);
+    }
+
+</script>

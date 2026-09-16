@@ -1,0 +1,153 @@
+<div class="msketch-panel-container" id="panel_pattern" style="display: none">
+    <div class="msketch-panel-title">Pattern<br>Generation</div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="Axis (World Coordinate)" style="width: 100%;">
+            <label class="form-radio" style="width: 32%;">
+                <input type="radio" name="gender" id="panel_pattern_x" checked>
+                <i class="form-icon"></i> <span class="msketch-panel-desc">x</span>
+            </label>
+                <label class="form-radio" style="width: 32%;">
+                    <input type="radio" name="gender" id="panel_pattern_y" >
+            <i class="form-icon"></i> <span class="msketch-panel-desc">y</span>
+            </label>
+            <label class="form-radio" style="width: 32%;">
+                <input type="radio" name="gender" id="panel_pattern_z">
+                <i class="form-icon"></i> <span class="msketch-panel-desc">z</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-label" data-label="Angle" style="width: 49%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_pattern_angle">
+        </div>
+        <div class="msketch-panel-label" data-label="Amount" style="width: 49%;">
+            <input class="form-input msketch-panel-input" type="text" id="panel_pattern_amount">
+        </div>
+    </div>
+
+    <button class="msketch-panel-btn-large" id="panel_pattern_apply"><i class="material-icons">done</i>Make</button>
+</div>
+
+
+<script>
+    $('#panel_pattern_apply').click( function(){
+        createPattern();
+    });
+    $('#panel_pattern_angle').on('change keyup paste', function(){
+        setPatternAmount();
+    })
+
+    function setPatternAmount(){
+        if( $('#panel_pattern_angle').val() == "" || $('#panel_pattern_angle').val() == null ){
+            $('#panel_pattern_amount').val( null );
+        }else{
+        	$('#panel_pattern_amount').val( parseInt( 360/parseFloat( $('#panel_pattern_angle').val() ) ) );
+        }
+    }
+
+    function getSelectedAxis(){
+        if( $('#panel_pattern_x').prop('checked') ){
+            return 'x';
+        }
+        else if( $('#panel_pattern_y').prop('checked') ){
+            return 'y';
+        }
+        else if( $('#panel_pattern_z').prop('checked') ){
+            return 'z';
+        }
+
+        return null;
+    }
+
+
+    function createPattern(){
+
+    	if( $('#panel_pattern_angle').val() == "" || $('#panel_pattern_angle').val() == null ||
+            $('#panel_pattern_amount').val() == "" || $('#panel_pattern_amount').val() == null ) return false;
+
+    	if(isPlaying)	interfaceSelect(TOOL_RUN);
+
+    	// get Axis
+    	var selectedAxis = getSelectedAxis();
+
+
+        var patternAmount = parseInt( $('#panel_pattern_amount').val() );
+
+        var _data = getMsketchInfoForPlane();
+
+        for(var i=1; i<patternAmount; i++){
+
+            var _dataJSON = JSON.parse(_data);
+
+            var _dist, _startAngle, _rotatedAngle;
+            var _x = parseFloat( _dataJSON.sketch.plane.translation.x ),
+                _y = parseFloat( _dataJSON.sketch.plane.translation.y ),
+                _z = parseFloat( _dataJSON.sketch.plane.translation.z ),
+                _rx = parseFloat( _dataJSON.sketch.plane.rotation.x ),
+                _ry = parseFloat( _dataJSON.sketch.plane.rotation.y ),
+                _rz = parseFloat( _dataJSON.sketch.plane.rotation.z );
+
+            var _stepAngle = Math.radians( parseFloat( $('#panel_pattern_angle').val() ) );
+
+            switch(selectedAxis){
+                case 'x':
+                    _dist = Math.sqrt((_y)*(_y) + (_z)*(_z));
+                    _startAngle = Math.atan2(_z, _y);
+                    _rotatedAngle = rotateAroundWorldAxis(new THREE.Vector3(1,0,0), _stepAngle*i,
+                                        Math.radians(_rx), Math.radians(_ry), Math.radians(_rz));
+
+                    _dataJSON.sketch.plane.translation.x = _x;
+                    _dataJSON.sketch.plane.translation.y = _dist*Math.cos(_startAngle+_stepAngle*i);
+                    _dataJSON.sketch.plane.translation.z = _dist*Math.sin(_startAngle+_stepAngle*i);
+                    _dataJSON.sketch.plane.rotation.x = Math.degrees( _rotatedAngle[0] );
+                    _dataJSON.sketch.plane.rotation.y = Math.degrees( _rotatedAngle[1] );
+                    _dataJSON.sketch.plane.rotation.z = Math.degrees( _rotatedAngle[2] );
+
+                    break;
+                case 'y':
+                    _dist = Math.sqrt((_x)*(_x) + (_z)*(_z));
+                    _startAngle = Math.atan2(_z, _x);
+                    _rotatedAngle = rotateAroundWorldAxis(new THREE.Vector3(0,1,0), -_stepAngle*i,
+                                        Math.radians(_rx), Math.radians(_ry), Math.radians(_rz));
+
+                    _dataJSON.sketch.plane.translation.x = _dist*Math.cos(_startAngle+_stepAngle*i);
+                    _dataJSON.sketch.plane.translation.y = _y;
+                    _dataJSON.sketch.plane.translation.z = _dist*Math.sin(_startAngle+_stepAngle*i);
+                    _dataJSON.sketch.plane.rotation.x = Math.degrees( _rotatedAngle[0] );
+                    _dataJSON.sketch.plane.rotation.y = Math.degrees( _rotatedAngle[1] );
+                    _dataJSON.sketch.plane.rotation.z = Math.degrees( _rotatedAngle[2] );
+                    break;
+                case 'z':
+                    _dist = Math.sqrt((_x)*(_x) + (_y)*(_y));
+                    _startAngle = Math.atan2(_y, _x);
+                    _rotatedAngle = rotateAroundWorldAxis(new THREE.Vector3(0,0,1), _stepAngle*i,
+                                        Math.radians(_rx), Math.radians(_ry), Math.radians(_rz));
+                    _dataJSON.sketch.plane.translation.x = _dist*Math.cos(_startAngle+_stepAngle*i);
+                    _dataJSON.sketch.plane.translation.y = _dist*Math.sin(_startAngle+_stepAngle*i);
+                    _dataJSON.sketch.plane.translation.z = _z;
+                    _dataJSON.sketch.plane.rotation.x = Math.degrees( _rotatedAngle[0] );
+                    _dataJSON.sketch.plane.rotation.y = Math.degrees( _rotatedAngle[1] );
+                    _dataJSON.sketch.plane.rotation.z = Math.degrees( _rotatedAngle[2] );
+                    break;
+            }
+            importPlaneInfo( JSON.stringify(_dataJSON) , true);
+        }
+    	checkHistory();
+
+    }
+
+    function rotateAroundWorldAxis(axis, angle, _x, _y, _z) {
+    	var object = new THREE.Object3D();
+    	object.rotation.x = _x;
+    	object.rotation.y = _y;
+    	object.rotation.z = _z;
+
+    	var q = new THREE.Quaternion();
+    	q.setFromAxisAngle( axis, angle ); // axis must be normalized, angle in radians
+    	object.quaternion.multiplyQuaternions( q, object.quaternion );
+    	return [object.rotation.x, object.rotation.y, object.rotation.z];
+    }
+
+
+</script>
