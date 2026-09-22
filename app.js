@@ -1,5 +1,7 @@
 // Define Packages
 
+require('dotenv').config();
+
 var express = require('express');
 
 var app = express();
@@ -34,9 +36,19 @@ var db = mongoose.connection;
 
 
 
-var dbAddress = 'mongodb+srv://CIDRLAB:4558cidr@msketch.qfqb7.mongodb.net/?retryWrites=true&w=majority&appName=MSketch';
+var dbAddress = process.env.MONGO_URI;
 
-// var dbAddress = 'mongodb+srv://nnitgd:bxgfWAeQg6qwgMts@msketchtestcluster.fsve2zd.mongodb.net/?retryWrites=true&w=majority&appName=MSketchTestCluster'
+if (!dbAddress) {
+
+    throw new Error('MONGO_URI environment variable is not set');
+
+}
+
+if (!process.env.SESSION_SECRET) {
+
+    throw new Error('SESSION_SECRET environment variable is not set');
+
+}
 
 mongoose.connect(dbAddress, { dbName: 'msketch'});
 
@@ -54,7 +66,7 @@ db.on('error', console.error.bind(console, 'connection error:'));
 
 db.once('open', function (callback) {
 
-    console.log("Mongo DB Connected at " + dbAddress)
+    console.log("Mongo DB Connected")
 
 });
 
@@ -64,7 +76,7 @@ db.once('open', function (callback) {
 
 app.use(session({
 
-    secret: 'msketch_cidr',
+    secret: process.env.SESSION_SECRET,
 
     resave: false,
 
