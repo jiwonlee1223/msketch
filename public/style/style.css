@@ -72,19 +72,30 @@ hr{
     height: 48px;
     display: inline-block;
     margin-left: 180px;
-    width: calc(100vw - 380px);
+    width: calc(100vw - 480px);
+}
+
+.msketch-titlebar-right{
+    position: absolute;
+    top: 0;
+    right: 32px;
+    height: 48px;
+    display: flex;
+    align-items: center;
 }
 
 .msketch-titlebar-username{
-    position: absolute;
     display: inline-block;
     color: #fff;
     font-size: 12px;
     font-weight: 200;
     outline: 0;
-    right: 32px;
-    top: 14px;
+    margin-left: 8px;
     vertical-align: middle;
+}
+
+.msketch-titlebar-right .msketch-titlebar-btn{
+    width: 36px;
 }
 .msketch-titlebar-username i{
     vertical-align: middle;
@@ -115,31 +126,37 @@ hr{
     color: #fff;
     border: none;
     height: 32px;
-    position: relative;
-    top: 7px;
-    margin-left: 60px;
+    /* centered in the titlebar, clear of the logo and the right-side buttons */
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
     font-size: 16px;
     font-weight: 200;
     outline: 0;
-    width: calc(100% - 180px);
+    width: min(400px, calc(100vw - 600px));
 }
 
 /* Tool bar */
 
 .msketch-toolbar{
     width: 100vw;
-    height: 36px;
+    min-height: 36px;
+    padding-left: 64px;
+    display: flex;
+    flex-wrap: wrap;
     background-color: #27262c;
     border-bottom: 1px solid #1e1d23;
-    z-index: 2;
+    position: relative;
+    z-index: 3;
 }
 
 
 
 .msketch-toolbar-container{
-    height: 36px;
-    display: inline-block;
-    margin-left: 64px;
+    /* children join the toolbar's wrapping flex row */
+    display: contents;
 
     -webkit-transition: all 0.3s ease-in-out;
     -moz-transition: all 0.3s ease-in-out;
@@ -160,6 +177,9 @@ hr{
 .msketch-toolbar-btn i{
     font-size: 21px;
     line-height: 36px;
+}
+.msketch-toolbar-btn svg{
+    vertical-align: middle;
 }
 .msketch-toolbar-btn img{
     width: 48px;
@@ -184,7 +204,7 @@ hr{
     color: #888;
     float: left;
     font-size: 11px;
-    margin-right: 12px;
+    margin-right: 8px;
 }
 
 .msketch-toolbar-spacer{
@@ -193,9 +213,15 @@ hr{
     color: #666;
     float: left;
     font-size: 11px;
-    margin-right: 12px;
-    width: 64px;
+    margin-right: 4px;
+    width: 28px;
     text-align: center;
+}
+
+/* pinned to the right end of the toolbar */
+#btn_play{
+    margin-left: auto;
+    margin-right: 16px;
 }
 
 
@@ -269,7 +295,7 @@ hr{
     transition: all 0.3s ease-in-out;
 }
 .msketch-panel.expand{
-    right: 36px;
+    right: 0;
 }
 
 #panel_close_btn{

@@ -11,43 +11,53 @@
         <span class="msketch-logo">M.SKETCH</span>
 
         <div class="msketch-titlebar-container">
-            <button class="msketch-titlebar-btn" id="btn_play" onclick="interfaceSelect(TOOL_RUN);" data-tooltip="Run"><i class="material-icons">play_arrow</i></button>
-            <button class="msketch-titlebar-btn" id="btn_save" onclick="showDialog(TOOL_SAVE)" data-tooltip="Save"><i class="material-icons">save</i></button>
             <input id="msketch-titlebar-filename" value="Untitled Sketch"></input>
         </div>
 
 
-        <div class="msketch-titlebar-username"><i class="material-icons">person_pin</i><%= user.name %></div>
+        <div class="msketch-titlebar-right">
+            <button class="msketch-titlebar-btn" id="btn_save" onclick="showDialog(TOOL_SAVE)" data-tooltip="Save"><i class="material-icons">save</i></button>
+            <button class="msketch-titlebar-btn msketch-panel-open" id="btn_settings" data-tooltip="Settings"><i class="material-icons">settings</i></button>
+            <div class="msketch-titlebar-username"><i class="material-icons">person_pin</i><%= user.name %></div>
+        </div>
 
     </div>
     <div class="msketch-toolbar">
         <div class="msketch-toolbar-container" id="msketch_toolbar">
-            <div class="msketch-toolbar-text">Drawing</div>
-            <button class="msketch-toolbar-btn" id="btn_link" onclick="interfaceSelect(TOOL_LINK);" data-tooltip="Add Link"><img src="./public/res/icons/btnLink.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_ja" onclick="interfaceSelect(TOOL_JA);" data-tooltip="Add Motor"><img src="./public/res/icons/btnJA.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_slider" onclick="interfaceSelect(TOOL_SLIDER);" data-tooltip="Set Slider"><img src="./public/res/icons/btnSlider.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_mark" onclick="interfaceSelect(TOOL_MARK);" data-tooltip="Toggle Marker"><img src="./public/res/icons/btnMark.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_move" onclick="interfaceSelect(TOOL_MOVE);" data-tooltip="Edit Link"><img src="./public/res/icons/btnMove.png"></button>
+            <div class="msketch-toolbar-text">Draw &amp; Edit</div>
+            <button class="msketch-toolbar-btn" id="btn_link" onclick="interfaceSelect(TOOL_LINK);" data-tooltip="Add Link"><img src="./public/res/icons/btnLink.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_ja" onclick="interfaceSelect(TOOL_JA);" data-tooltip="Add Motor"><img src="./public/res/icons/btnJA.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_slider" onclick="interfaceSelect(TOOL_SLIDER);" data-tooltip="Set Slider"><img src="./public/res/icons/btnSlider.svg"></button>
+            <button class="msketch-toolbar-btn msketch-panel-open" id="btn_panel_gen" data-tooltip="Linkage Generation"><i class="material-icons">gesture</i></button>
+            <button class="msketch-toolbar-btn msketch-panel-open" id="btn_panel_link3d" data-tooltip="3D Link Generation"><i class="material-icons">hardware</i></button>
+            <button class="msketch-toolbar-btn msketch-panel-open" id="btn_panel_gear" data-tooltip="Gear Generation"><svg viewBox="0 0 24 24" width="21" height="21"><path fill="currentColor" fill-rule="evenodd" d="M14.33 8.66 L15.97 8.84 L15.97 10.16 L14.33 10.34 L13.81 11.95 L15.03 13.06 L14.25 14.13 L12.82 13.32 L11.45 14.31 L11.78 15.92 L10.53 16.33 L9.84 14.83 L8.16 14.83 L7.47 16.33 L6.22 15.92 L6.55 14.31 L5.18 13.32 L3.75 14.13 L2.97 13.06 L4.19 11.95 L3.67 10.34 L2.03 10.16 L2.03 8.84 L3.67 8.66 L4.19 7.05 L2.97 5.94 L3.75 4.87 L5.18 5.68 L6.55 4.69 L6.22 3.08 L7.47 2.67 L8.16 4.17 L9.84 4.17 L10.53 2.67 L11.78 3.08 L11.45 4.69 L12.82 5.68 L14.25 4.87 L15.03 5.94 L13.81 7.05ZM11.20 9.50A2.2 2.2 0 1 0 6.80 9.50A2.2 2.2 0 1 0 11.20 9.50ZM21.63 17.96 L22.73 18.55 L22.31 19.55 L21.13 19.19 L20.19 20.13 L20.55 21.31 L19.55 21.73 L18.96 20.63 L17.64 20.63 L17.05 21.73 L16.05 21.31 L16.41 20.13 L15.47 19.19 L14.29 19.55 L13.87 18.55 L14.97 17.96 L14.97 16.64 L13.87 16.05 L14.29 15.05 L15.47 15.41 L16.41 14.47 L16.05 13.29 L17.05 12.87 L17.64 13.97 L18.96 13.97 L19.55 12.87 L20.55 13.29 L20.19 14.47 L21.13 15.41 L22.31 15.05 L22.73 16.05 L21.63 16.64ZM19.70 17.30A1.4 1.4 0 1 0 16.90 17.30A1.4 1.4 0 1 0 19.70 17.30Z"/></svg></button>
             <button class="msketch-toolbar-btn" id="btn_remove" onclick="interfaceSelect(TOOL_REMOVE);" data-tooltip="Remove Part"><i class="material-icons">delete_forever</i></button>
+            <button class="msketch-toolbar-btn" id="btn_select" onclick="interfaceSelect(TOOL_SELECT);" data-tooltip="Select"><i class="material-icons">near_me</i></button>
+            <button class="msketch-toolbar-btn" id="btn_move" onclick="interfaceSelect(TOOL_MOVE);" data-tooltip="Edit Link"><img src="./public/res/icons/btnMove.svg"></button>
+            <button class="msketch-toolbar-btn msketch-panel-open" id="btn_panel_pattern" data-tooltip="Pattern Generation"><i class="material-icons">filter_tilt_shift</i></button>
             <div class="msketch-toolbar-spacer">|</div>
-            <div class="msketch-toolbar-text">Navigation</div>
+            <div class="msketch-toolbar-text">View</div>
+            <button class="msketch-toolbar-btn" id="btn_mark" onclick="interfaceSelect(TOOL_MARK);" data-tooltip="Toggle Marker"><img src="./public/res/icons/btnMark.svg"></button>
             <button class="msketch-toolbar-btn" id="btn_nav" onclick="interfaceSelect(TOOL_NAV);" data-tooltip="Toggle View Tumbling"><i class="material-icons">3d_rotation</i></button>
             <button class="msketch-toolbar-btn" id="btn_pcam" onclick="interfaceSelect(TOOL_PCAM);" data-tooltip="See Plane on Top"><i class="material-icons">fullscreen</i></button>
-            <button class="msketch-toolbar-btn" id="btn_pcam" onclick="setViewMode(0);" data-tooltip="Schematic View"><img src="./public/res/icons/btnSchematicView.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_pcam" onclick="setViewMode(1);" data-tooltip="Part View"><img src="./public/res/icons/btnPartsView.png"></button>
+            <button class="msketch-toolbar-btn" id="btn_pcam" onclick="setViewMode(0);" data-tooltip="Schematic View"><img src="./public/res/icons/btnSchematicView.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_pcam" onclick="setViewMode(1);" data-tooltip="Part View"><img src="./public/res/icons/btnPartsView.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_show3d" onclick="set3DView();" data-tooltip="3D View"><img src="./public/res/icons/btn3DView.svg"></button>
+            <div class="msketch-toolbar-spacer">|</div>
+            <div class="msketch-toolbar-text">Plane</div>
+            <button class="msketch-toolbar-btn" id="btn_padd" onclick="interfaceSelect(TOOL_PADD);" data-tooltip="Add Plane"><img src="./public/res/icons/btnPAdd.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_premove" onclick="showDialog(TOOL_PREMOVE);" data-tooltip="Remove Plane"><img src="./public/res/icons/btnPRemove.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_psel" onclick="interfaceSelect(TOOL_PSEL);" data-tooltip="Select Plane"><img src="./public/res/icons/btnPSel.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_ptrans" onclick="interfaceSelect(TOOL_PTRANS);" data-tooltip="Plane Translation"><img src="./public/res/icons/btnPTrans.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_prot" onclick="interfaceSelect(TOOL_PROT);" data-tooltip="Plane Rotation"><img src="./public/res/icons/btnPRot.svg"></button>
+            <button class="msketch-toolbar-btn" id="btn_prot" onclick="interfaceSelect(TOOL_PCOPY);" data-tooltip="Copy This Plane"><img src="./public/res/icons/btnPCopy.svg"></button>
             <div class="msketch-toolbar-spacer">|</div>
             <div class="msketch-toolbar-text">History</div>
             <button class="msketch-toolbar-btn" id="btn_nav" onclick="undo();" data-tooltip="Undo"><i class="material-icons">chevron_left</i></button>
             <button class="msketch-toolbar-btn" id="btn_pcam" onclick="redo();" data-tooltip="Redo"><i class="material-icons">chevron_right</i></button>
-            <div class="msketch-toolbar-spacer">|</div>
-            <div class="msketch-toolbar-text">Plane</div>
-            <button class="msketch-toolbar-btn" id="btn_padd" onclick="interfaceSelect(TOOL_PADD);" data-tooltip="Add Plane"><img src="./public/res/icons/btnPAdd.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_premove" onclick="showDialog(TOOL_PREMOVE);" data-tooltip="Remove Plane"><img src="./public/res/icons/btnPRemove.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_psel" onclick="interfaceSelect(TOOL_PSEL);" data-tooltip="Select Plane"><img src="./public/res/icons/btnPSel.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_ptrans" onclick="interfaceSelect(TOOL_PTRANS);" data-tooltip="Plane Translation"><img src="./public/res/icons/btnPTrans.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_prot" onclick="interfaceSelect(TOOL_PROT);" data-tooltip="Plane Rotation"><img src="./public/res/icons/btnPRot.png"></button>
-            <button class="msketch-toolbar-btn" id="btn_prot" onclick="interfaceSelect(TOOL_PCOPY);" data-tooltip="Copy This Plane"><img src="./public/res/icons/btnPCopy.png"></button>
         </div>
+        <!-- Kept outside #msketch_toolbar so it stays clickable (to stop) while the toolbar is disabled during play -->
+        <button class="msketch-toolbar-btn" id="btn_play" onclick="interfaceSelect(TOOL_RUN);" data-tooltip="Run"><i class="material-icons">play_arrow</i></button>
 
     </div>
 

@@ -22,6 +22,8 @@ var TOOL_RUN 			= 1,
 
 	TOOL_SLIDER			= 14;
 	TOOL_PCOPY 			= 15;
+	TOOL_SELECT 		= 16;
+	TOOL_STACK 			= 17;
 
 	// Menubar
 	TOOL_NEWFILE 		= 21,
@@ -104,7 +106,7 @@ function interfaceSelect(_selected){
 					setTool(toolState);
 				}
 			}else{
-				if(prevTool == TOOL_LINK || prevTool == TOOL_JA || prevTool == TOOL_MARK || prevTool == TOOL_MOVE || prevTool == TOOL_REMOVE ){
+				if(prevTool == TOOL_LINK || prevTool == TOOL_JA || prevTool == TOOL_MARK || prevTool == TOOL_MOVE || prevTool == TOOL_REMOVE || prevTool == TOOL_SELECT || prevTool == TOOL_STACK ){
 					toolState=prevTool;
 					setTool(toolState);
 				}
@@ -139,6 +141,16 @@ function interfaceSelect(_selected){
 		case TOOL_REMOVE:
 			if(toolState!=TOOL_REMOVE) toolState = TOOL_REMOVE;
 			else if(toolState==TOOL_REMOVE) toolState = -1;
+			setTool(toolState);
+			break;
+		case TOOL_SELECT:
+			if(toolState!=TOOL_SELECT) toolState = TOOL_SELECT;
+			else if(toolState==TOOL_SELECT) toolState = -1;
+			setTool(toolState);
+			break;
+		case TOOL_STACK:
+			if(toolState!=TOOL_STACK) toolState = TOOL_STACK;
+			else if(toolState==TOOL_STACK) toolState = -1;
 			setTool(toolState);
 			break;
 
@@ -324,6 +336,14 @@ function setTool(_tool){
 			currentInterface = new RemoveInterface();
 			_allowNav = false;
 			break;
+		case TOOL_SELECT:
+			currentInterface = new SelectInterface();
+			_allowNav = false;
+			break;
+		case TOOL_STACK:
+			currentInterface = new StackInterface();
+			_allowNav = false;
+			break;
 		case TOOL_PTRANS:
 			transformControl.attach( currentAssemblyGroup.group );
 			transformControl.setMode( "translate" );
@@ -416,6 +436,8 @@ function checkToolSet() {
 	else 							$('#btn_move').removeClass('active');
 	if(toolState == TOOL_REMOVE)	$('#btn_remove').addClass('active');
 	else 							$('#btn_remove').removeClass('active');
+	if(toolState == TOOL_SELECT)	$('#btn_select').addClass('active');
+	else 							$('#btn_select').removeClass('active');
 	if(toolState == TOOL_PSEL)		$('#btn_psel').addClass('active');
 	else 							$('#btn_psel').removeClass('active');
 	if(toolState == TOOL_PTRANS)	$('#btn_ptrans').addClass('active');
@@ -446,11 +468,8 @@ function checkToolSet() {
 	if(toolState == TOOL_REMOVELOAD)	$('#btn_removeload').addClass('active');
 	else 								$('#btn_removeload').removeClass('active');
 
-	if (isPlaying) {
-		$('#msketch_toolbar').addClass('disableClick')
-    } else {
-		$('#msketch_toolbar').removeClass('disableClick');
-    }
+	// Panel buttons stay usable while playing, as they were on the sidebar
+	$('#msketch_toolbar').children().not('.msketch-panel-open').toggleClass('disableClick', isPlaying);
 
 	if (toolState != TOOL_MOVE) {
         selectedPoint = null;
@@ -462,9 +481,17 @@ function checkToolSet() {
 }
 
 function setViewMode(_index){
+	// Schematic / Part view leave the 3D view
+	if(Link3D.SHOW_3D) show3Dlinks(false);
 	viewMode = _index;
 	for(var i=0; i<AssemblyGroupList.length; i++){
 		AssemblyGroupList[i].needsUpdate = true;
 		AssemblyGroupList[i].load();
 	}
+}
+
+// Part view with the extruded 3D links
+function set3DView(){
+	setViewMode(1);
+	show3Dlinks(true);
 }

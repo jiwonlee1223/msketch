@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48"><svg x="14.0" y="16.0" width="23.0" height="16.0" viewBox="0 0 41.0415 30.5679" preserveAspectRatio="none">
+<defs>
+<clipPath id="i0-clip-0">
+<path clip-rule="nonzero" d="M 0 0.136719 L 40.105469 0.136719 L 40.105469 30.007812 L 0 30.007812 Z M 0 0.136719 "/>
+</clipPath>
+</defs>
+<g clip-path="url(#i0-clip-0)">
+<path fill="none" stroke-width="3" stroke-linecap="butt" stroke-linejoin="miter" stroke="#fff" stroke-opacity="1" stroke-miterlimit="10" d="M 0.0017612 0.0000240744 C 0.0017612 -6.12811 -4.967104 -11.096975 -11.095238 -11.096975 C -17.223372 -11.096975 -22.192238 -6.12811 -22.192238 0.0000240744 C -22.192238 6.128158 -17.223372 11.097023 -11.095238 11.097023 C -4.967104 11.097023 0.0017612 6.128158 0.0017612 0.0000240744 Z M 0.0017612 0.0000240744 " transform="matrix(0.977179, 0, 0, -0.977179, 28.404529, 17.699242)"/>
+<path fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="miter" stroke="#fff" stroke-opacity="1" stroke-miterlimit="10" d="M -0.000945689 0.00193158 L 16.472662 -16.471676 L 38.043054 -16.471676 " transform="matrix(0.977179, 0, 0, -0.977179, 1.465768, 1.60345)"/>
+</g>
+<path fill-rule="nonzero" fill="#fff" fill-opacity="1" d="M 21.972656 17.699219 C 21.972656 15.261719 19.996094 13.289062 17.5625 13.289062 C 15.125 13.289062 13.152344 15.261719 13.152344 17.699219 C 13.152344 20.132812 15.125 22.109375 17.5625 22.109375 C 19.996094 22.109375 21.972656 20.132812 21.972656 17.699219 "/>
+</svg>
+</svg>

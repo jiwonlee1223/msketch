@@ -581,6 +581,69 @@ RemoveInterface.prototype.mouseDownAndUp = function(_x, _y){}
 RemoveInterface.prototype.mouseMoveAndUp = function(_x, _y){}
 
 
+//--------------------
+// Select Class
+//--------------------
+// Opens the settings panel of what was clicked: motor, link (part) or plane (view)
+function SelectInterface(){
+}
+
+SelectInterface.prototype.mouseMove = function(_x, _y){
+    hoverActuator = getActuatorByPosition(_x, _y);
+    if(hoverActuator==null){
+      hoverLink = getLinkUnderMouse(_x, _y);
+    }else{
+      hoverLink = null;
+    }
+}
+
+SelectInterface.prototype.mouseDown = function(_x, _y){
+    if(hoverActuator!=null){
+      showMotorPanel(hoverActuator);
+    }else if(hoverLink!=null){
+      showSettingsPanel('panel_settings_part');
+    }else if(isOnCurrentPlane(_x, _y)){
+      showSettingsPanel('panel_settings_view');
+    }
+}
+
+SelectInterface.prototype.mouseDownAndMoveFirst = function(_x, _y){}
+SelectInterface.prototype.mouseDownAndMove = function(_x, _y){}
+SelectInterface.prototype.mouseDownAndUp = function(_x, _y){}
+SelectInterface.prototype.mouseMoveAndUp = function(_x, _y){}
+
+
+//--------------------
+// Stack Class
+//--------------------
+// Active while the 3D Link Generation panel is open: picks the link to restack
+function StackInterface(){
+}
+
+StackInterface.prototype.mouseMove = function(_x, _y){
+    hoverLink = getLinkUnderMouse(_x, _y);
+}
+
+StackInterface.prototype.mouseDown = function(_x, _y){
+    if(hoverLink!=null){
+      setStackTarget(hoverLink);
+      showMessage(hoverLink.getName() + " selected");
+    }
+}
+
+StackInterface.prototype.mouseDownAndMoveFirst = function(_x, _y){}
+StackInterface.prototype.mouseDownAndMove = function(_x, _y){}
+StackInterface.prototype.mouseDownAndUp = function(_x, _y){}
+StackInterface.prototype.mouseMoveAndUp = function(_x, _y){}
+
+// the visible plane is centered at the origin of the assembly group
+function isOnCurrentPlane(_x, _y){
+    if(intersects.length==0) return false;
+    var _half = (msketchSettings.planeSize/SCALE_TRANS)/2;
+    return Math.abs(_x) <= _half && Math.abs(_y) <= _half;
+}
+
+
 
 function OptInterface(){
   currentAssemblyGroup.optimizedPath = new Trajectory();
@@ -863,6 +926,25 @@ function getLinkByPosition(_x, _y) {
     }
   }
   return null;
+}
+
+// In 3D view the link meshes are drawn above the sketch plane (by their stack),
+// so pick what is actually visible under the cursor before falling back to 2D
+function getLinkUnderMouse(_x, _y) {
+  if (Link3D.SHOW_3D) {
+    var meshes = [];
+    for (var i=0; i<currentAssemblyGroup.objectList.length; i++) {
+      var obj = currentAssemblyGroup.objectList[i];
+      if (obj instanceof Link3D && obj.link3DObject != null) meshes.push(obj.link3DObject);
+    }
+    var hits = raycaster.intersectObjects(meshes, false);
+    if (hits.length > 0) {
+      for (var i=0; i<currentAssemblyGroup.objectList.length; i++) {
+        if (currentAssemblyGroup.objectList[i].link3DObject == hits[0].object) return currentAssemblyGroup.objectList[i].link;
+      }
+    }
+  }
+  return getLinkByPosition(_x, _y);
 }
 
 function getAllLinkByPosition(_x, _y) {

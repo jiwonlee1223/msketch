@@ -1,16 +1,3 @@
-<div class="msketch-sidebar">
-    <button class="msketch-toolbar-btn" id="btn_panel_move" data-tooltip-side="Position Panel"><i class="material-icons">open_with</i></button>
-    <button class="msketch-toolbar-btn" id="btn_panel_plane" data-tooltip-side="Plane Panel"><i class="material-icons">layers</i></button>
-    <button class="msketch-toolbar-btn" id="btn_panel_motor" data-tooltip-side="Motor Panel"><i class="material-icons">slow_motion_video</i></button>
-    <button class="msketch-toolbar-btn" id="btn_panel_pattern" data-tooltip-side="Pattern Panel"><i class="material-icons">filter_tilt_shift</i></button>
-    <button class="msketch-toolbar-btn" id="btn_panel_analysis" data-tooltip-side="Walking Analysis Panel"><i class="material-icons">multiline_chart</i></button>
-    <button class="msketch-toolbar-btn" id="btn_panel_opt" data-tooltip-side="Path Optimization Panel"><i class="material-icons">gesture</i></button>
-    <button class="msketch-toolbar-btn" id="btn_panel_fab" data-tooltip-side="Fabrication Panel"><i class="material-icons">build</i></button>
-    <button class="msketch-toolbar-btn" id="btn_panel_gen" data-tooltip-side="Linkage Generation Panel"><i class="material-icons">linear_scale</i></button>
-    <button class="msketch-toolbar-btn" id="btn_panel_load" data-tooltip-side="Load Panel"><i class="material-icons">play_for_work</i></button>
-    <button class="msketch-toolbar-btn" id="btn_settings" data-tooltip-side="Settings"><i class="material-icons">settings</i></button>
-</div>
-
 <div class="msketch-panel" id="msketch_panel">
     <%- include("panel_move") -%>
     <%- include("panel_plane") -%>
@@ -26,34 +13,10 @@
     <div id="panel_close_btn"><i class="material-icons">close</i></div>
 </div>
 
-
 <script>
     $('#panel_close_btn').click(function(){
     	$('#msketch_panel').removeClass('expand');
         removePanelActiveClass();
-    });
-
-    $('#btn_panel_move').click(function(){
-        removePanelActiveClass();
-        $('#btn_panel_move').addClass('active');
-        $('#msketch_panel').addClass('expand');
-        $('#panel_move').show();
-    });
-
-    $('#btn_panel_plane').click(function(){
-        removePanelActiveClass();
-        $('#btn_panel_plane').addClass('active');
-        $('#msketch_panel').addClass('expand');
-        $('#panel_plane').show();
-        getPlaneInfoToPlanePanel();
-    });
-
-    $('#btn_panel_motor').click(function(){
-        removePanelActiveClass();
-        $('#btn_panel_motor').addClass('active');
-        $('#msketch_panel').addClass('expand');
-        $('#panel_motor').show();
-        getPlaneInfoToPlanePanel();
     });
 
     $('#btn_panel_pattern').click(function(){
@@ -61,22 +24,6 @@
         $('#btn_panel_pattern').addClass('active');
         $('#msketch_panel').addClass('expand');
         $('#panel_pattern').show();
-        getPlaneInfoToPlanePanel();
-    });
-
-    $('#btn_panel_analysis').click(function(){
-        removePanelActiveClass();
-        $('#btn_panel_analysis').addClass('active');
-        $('#msketch_panel').addClass('expand');
-        $('#panel_analysis').show();
-        getPlaneInfoToPlanePanel();
-    });
-
-    $('#btn_panel_opt').click(function(){
-        removePanelActiveClass();
-        $('#btn_panel_opt').addClass('active');
-        $('#msketch_panel').addClass('expand');
-        $('#panel_opt').show();
         getPlaneInfoToPlanePanel();
     });
 
@@ -88,19 +35,21 @@
         getPlaneInfoToPlanePanel();
     });
 
-    $('#btn_panel_fab').click(function(){
-      removePanelActiveClass();
-      $('#btn_panel_fab').addClass('active');
-      $('#msketch_panel').addClass('expand');
-      $('#panel_fab').show();
-      getPlaneInfoToPlanePanel();
-  });
-
-    $('#btn_panel_load').click(function(){
+    $('#btn_panel_link3d').click(function(){
         removePanelActiveClass();
-        $('#btn_panel_load').addClass('active');
+        $('#btn_panel_link3d').addClass('active');
         $('#msketch_panel').addClass('expand');
-        $('#panel_load').show();
+        $('#panel_fab_link').show();
+        getPlaneInfoToPlanePanel();
+
+        if(!isPlaying) interfaceSelect(TOOL_STACK);
+    });
+
+    $('#btn_panel_gear').click(function(){
+        removePanelActiveClass();
+        $('#btn_panel_gear').addClass('active');
+        $('#msketch_panel').addClass('expand');
+        $('#panel_fab_gear').show();
         getPlaneInfoToPlanePanel();
     });
 
@@ -114,8 +63,34 @@
         loadSettings();
     });
 
+    // opened by the Select tool (plane -> view settings, link -> part settings)
+    function showSettingsPanel(_panelId){
+        removePanelActiveClass();
+        $('#msketch_panel').addClass('expand');
+        $('#' + _panelId).show();
+
+        loadSettings();
+    }
+
+    // opened by the Select tool when a motor is clicked
+    function showMotorPanel(_actuator){
+        removePanelActiveClass();
+        $('#msketch_panel').addClass('expand');
+        $('#panel_motor').show();
+        getPlaneInfoToPlanePanel();
+
+        updateMotorList();
+        var _name = _actuator.getName() + " on Plane" + findCurrentAssemblyNum();
+        $('#motor_list option').filter(function(){ return $(this).text() == _name; }).prop('selected', true);
+        updateMotorInfo();
+    }
+
     function removePanelActiveClass(){
-        $('.msketch-sidebar').children().removeClass('active');
+        // leaving the 3D Link panel ends link picking for stacking
+        if(toolState==TOOL_STACK) interfaceSelect(TOOL_STACK);
+        setStackTarget(null);
+
+        $('.msketch-panel-open').removeClass('active');
         $('#msketch_panel').children().hide();
         $('#panel_close_btn').show();
     };

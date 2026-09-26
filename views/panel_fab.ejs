@@ -2,17 +2,13 @@
 updated by yunwoo jeong -->
 <!-- yw_edited -->
 
-<div class="msketch-panel-container" id="panel_fab" style="display: none">
-    <div class="msketch-panel-title">Fabrication</div>
+<div class="msketch-panel-container" id="panel_fab_link" style="display: none">
+    <div class="msketch-panel-title">3D Link<br>Generation</div>
     <div class="msketch-panel-row">
-        <div class="msketch-panel-desc">Generate the 3D links and gears. Use 'Edit Link' tool to select a link</div>
+        <div class="msketch-panel-desc">Click a link on the plane, then change its stacking order.</div>
     </div>
     <div class="msketch-panel-row">
-      <div class="msketch-panel-desc" style="font-weight: 700">3D Link Generation</div>
-      <label class="form-switch">
-        <input type="checkbox" id="panel_fab_Show3DLink">
-        <i class="form-icon"></i> <span class="msketch-panel-desc">Show 3D Link</span>
-      </label>
+        <div class="msketch-panel-desc" id="panel_fab_stackTarget" style="font-weight: 700"></div>
     </div>
     <div class="msketch-panel-row">
       <div class="msketch-panel-btn-text">Stacking Order</div>
@@ -20,39 +16,50 @@ updated by yunwoo jeong -->
       <button class="msketch-panel-btn" id="btn_stackMinus"><i class="material-icons">remove_circle_outline</i></button>
     </div>
     <button class="msketch-panel-btn-large" id="panel_fab_downloadLink"><i class="material-icons">file_download</i>Download Links (OBJ)</button>
-    <hr>
+</div>
 
-    <div class="msketch-panel-desc" style="font-weight: 700">Gear Generation</div>
+<div class="msketch-panel-container" id="panel_fab_gear" style="display: none">
+    <div class="msketch-panel-title">Gear<br>Generation</div>
+    <div class="msketch-panel-row">
+        <div class="msketch-panel-desc">Generate the gears.</div>
+    </div>
     <div class="msketch-panel-row">
         <button class="msketch-panel-btn-large" id="panel_fab_generateGear" style="width: 47%; display:inline-block; float: left"><i class="material-icons">done</i>Generate</button>
         <button class="msketch-panel-btn-large" id="panel_fab_removeGear" style="width: 47%; display:inline-block; float: right"><i class="material-icons">remove</i>Remove</button>
     </div>
     <button class="msketch-panel-btn-large" id="panel_fab_downloadGear"><i class="material-icons">file_download</i>Download Gears (OBJ)</button>
-
 </div>
 
 
 <script>
-$('#panel_fab_Show3DLink').on('change', function(){
-    show3Dlinks( $(this).prop('checked') );
-})
+var stackTargetLink = null;
+
+function setStackTarget(_link){
+    stackTargetLink = _link;
+    if(stackTargetLink == null)  $('#panel_fab_stackTarget').text('No link selected');
+    else                         $('#panel_fab_stackTarget').text(stackTargetLink.getName() + ' · Stack ' + stackTargetLink.stack);
+}
+setStackTarget(null);
+
+function changeStack(_delta){
+    if(stackTargetLink==null){
+        showMessage("Click a link to select it first.");
+        return false;
+    }
+    var _link = currentAssemblyGroup.findObjectFromElement(stackTargetLink);
+    if(_link != null){
+        stackTargetLink.stack += _delta;
+        _link.updateStack();
+        setStackTarget(stackTargetLink);
+    }
+}
 
 $('#btn_stackPlus').click(function(){
-  if(selectedLink==null) return false;
-    var _link = currentAssemblyGroup.findObjectFromElement(selectedLink);
-    if(_link != null){
-        selectedLink.stack++;
-        _link.updateStack();
-    }
+    changeStack(1);
 });
 
 $('#btn_stackMinus').click(function(){
-  if(selectedLink==null) return false;
-    var _link = currentAssemblyGroup.findObjectFromElement(selectedLink);
-    if(_link != null){
-        selectedLink.stack--;
-        _link.updateStack();
-    }
+    changeStack(-1);
 });
 
 $('#panel_fab_downloadLink').click(function(){

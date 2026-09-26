@@ -60,6 +60,9 @@ Link3D.prototype.setVertices = function(_vertices, _vertices3D){
 Link3D.prototype.setColor = function(_color){
 	this.linkMaterial.color.setHex( _color );
 }
+Link3D.prototype.set3DHighlight = function(_on){
+	this.link3DMaterial.color.setHex( _on ? SELECTED_COLOR : 0xC0C0C0 );
+}
 
 // for 3D
 Link3D.HEIGHT			= 30;

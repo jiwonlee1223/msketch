@@ -1,8 +1,18 @@
+<!-- System settings open from the titlebar; View / Part settings open from the Select tool (plane / link) -->
 <div class="msketch-panel-container" id="panel_settings" style="display: none">
-    <div class="msketch-panel-title">Settings</div>
-
+    <div class="msketch-panel-title">System<br>Settings</div>
     <div class="msketch-panel-row">
-      <div class="msketch-panel-desc" style="font-weight: 700">View</div>
+      <div class="msketch-panel-label" data-label="Max History Size" style="width: 100%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_maxHistory">
+      </div>
+    </div>
+
+    <button class="msketch-panel-btn-large setting-apply" id="setting_apply"><i class="material-icons">done</i>Apply</button>
+</div>
+
+<div class="msketch-panel-container" id="panel_settings_view" style="display: none">
+    <div class="msketch-panel-title">View<br>Properties</div>
+    <div class="msketch-panel-row">
       <label class="form-switch">
         <input type="checkbox" id="setting_showGrid">
         <i class="form-icon"></i> <span class="msketch-panel-desc">Show Grid</span>
@@ -24,9 +34,14 @@
           <input class="form-input msketch-panel-input" type="text" id="setting_planeSize">
       </div>
     </div>
-    <hr>
+
+    <button class="msketch-panel-btn-large setting-apply"><i class="material-icons">done</i>Apply</button>
+</div>
+
+<div class="msketch-panel-container" id="panel_settings_part" style="display: none">
+    <div class="msketch-panel-title">Part<br>Properties</div>
     <div class="msketch-panel-row">
-      <div class="msketch-panel-desc" style="font-weight: 700">Part</div>
+        <div class="msketch-panel-desc">Applies to all links.</div>
     </div>
     <div class="msketch-panel-row">
       <div class="msketch-panel-label" data-label="Hole Dia. (mm)" style="width: 100%;">
@@ -41,22 +56,13 @@
           <input class="form-input msketch-panel-input" type="text" id="setting_linkThickness">
       </div>
     </div>
-    <hr>
-    <div class="msketch-panel-row">
-      <div class="msketch-panel-desc" style="font-weight: 700">System</div>
-    </div>
-    <div class="msketch-panel-row">
-      <div class="msketch-panel-label" data-label="Max History Size" style="width: 100%;">
-          <input class="form-input msketch-panel-input" type="text" id="setting_maxHistory">
-      </div>
-    </div>
 
-    <button class="msketch-panel-btn-large" id="setting_apply"><i class="material-icons">done</i>Apply</button>
+    <button class="msketch-panel-btn-large setting-apply"><i class="material-icons">done</i>Apply</button>
 </div>
 
 <script>
 
-    $('#setting_apply').click( function(){
+    $('.setting-apply').click( function(){
         applySettings();
     });
 
