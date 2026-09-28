@@ -420,6 +420,8 @@ function closeDrawer(){
 function checkToolSet() {
 	if(isPlaying)		$('#btn_play').addClass('active');
 	else 				$('#btn_play').removeClass('active');
+	$('#btn_play i').text( isPlaying ? 'pause' : 'play_arrow' );
+	$('#btn_play').attr('data-tooltip', isPlaying ? 'Pause' : 'Run');
 
 	if(isControlable)	$('#btn_nav').addClass('active');
 	else 				$('#btn_nav').removeClass('active');
@@ -468,8 +470,7 @@ function checkToolSet() {
 	if(toolState == TOOL_REMOVELOAD)	$('#btn_removeload').addClass('active');
 	else 								$('#btn_removeload').removeClass('active');
 
-	// Panel buttons stay usable while playing, as they were on the sidebar
-	$('#msketch_toolbar').children().not('.msketch-panel-open').toggleClass('disableClick', isPlaying);
+	$('#msketch_toolbar').children().toggleClass('disableClick', isPlaying);
 
 	if (toolState != TOOL_MOVE) {
         selectedPoint = null;
