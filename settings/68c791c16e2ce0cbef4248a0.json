@@ -4,7 +4,7 @@
 	"showPlane": true,
 	"gridGap": 10,
 	"planeSize": 100,
-	"linkWidth": 12.7,
+	"linkWidth": 8,
 	"holeDiameter": 4,
 	"linkThickness": 12,
 	"MaxHistorySize": 20

@@ -72,14 +72,19 @@
         loadSettings();
     }
 
-    // opened by the Select tool when a motor is clicked
-    function showMotorPanel(_actuator){
+    // opened from the menu with no motor selected
+    function openMotorPanel(){
         removePanelActiveClass();
         $('#msketch_panel').addClass('expand');
         $('#panel_motor').show();
         getPlaneInfoToPlanePanel();
 
         updateMotorList();
+    }
+
+    // opened by the Select tool when a motor is clicked
+    function showMotorPanel(_actuator){
+        openMotorPanel();
         var _name = _actuator.getName() + " on Plane" + findCurrentAssemblyNum();
         $('#motor_list option').filter(function(){ return $(this).text() == _name; }).prop('selected', true);
         updateMotorInfo();

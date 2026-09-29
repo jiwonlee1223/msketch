@@ -225,7 +225,7 @@ function interfaceSelect(_selected){
 			interfaceSelect(TOOL_PADD);
 			loadFromStringData(dataFile, true);
 			dataFile=null;
-			toggleDrawer();
+			closeDrawer();
 			break;
 		case TOOL_DRAWING:
 			exportDrawing();
@@ -233,22 +233,22 @@ function interfaceSelect(_selected){
 			break;
 		case TOOL_CAMEO_DRAWING:
 			exportCameoDrawing();
-			toggleDrawer();
+			closeDrawer();
 			break;
 		case TOOL_EDISON_XML:
 			if(isPlaying)	interfaceSelect(TOOL_RUN);
 			exportEdisonXML();
-			toggleDrawer();
+			closeDrawer();
 			break;
 		case TOOL_EXAMPLE:
 			if(isPlaying)	interfaceSelect(TOOL_RUN);
 			openFileFromStringData(dataFile, true);
 			dataFile=null;
-			toggleDrawer();
+			closeDrawer();
 			break;
 		case TOOL_MANUAL:
 			window.open(MANUAL_URL, '_blank');
-			toggleDrawer();
+			closeDrawer();
 			break;
 
 		// External Tools
@@ -403,6 +403,7 @@ $('#msketch_drawer_open').click(function(){
 	}else{
 		$('#msketch_drawer').css('left', 0);
 	}
+	$('#msketch_drawer').toggleClass('open');
 
 	$('#msketch_drawer_open').toggleClass('active');
 });
@@ -412,7 +413,13 @@ function closeDrawer(){
 		$('#msketch_drawer').css('left', -240);
 	}
 	$('#msketch_drawer_open').removeClass('active');
+	$('#msketch_drawer').removeClass('open');
 }
+
+// any leaf item in the menu closes the drawer after running its action
+$('#msketch_drawer').on('click', '.msketch-menu-item:not(.has-sub)', function(){
+	closeDrawer();
+});
 
 
 
@@ -471,6 +478,7 @@ function checkToolSet() {
 	else 								$('#btn_removeload').removeClass('active');
 
 	$('#msketch_toolbar').children().toggleClass('disableClick', isPlaying);
+	$('#msketch_drawer .msketch-menu-lock').toggleClass('disableClick', isPlaying);
 
 	if (toolState != TOOL_MOVE) {
         selectedPoint = null;

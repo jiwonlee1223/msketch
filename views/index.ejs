@@ -61,15 +61,83 @@
 
     </div>
 
+    <!-- Menu labels follow the toolbar tooltips. Items in .msketch-menu-lock are disabled during play like the toolbar -->
     <div class="msketch-drawer" id="msketch_drawer">
-        <button class="msketch-drawer-btn" onclick="showDialog(TOOL_NEWFILE);"><i class="material-icons">insert_drive_file</i>New</button>
-        <button class="msketch-drawer-btn" onclick="showDialog(TOOL_SAVE);"><i class="material-icons">save</i>Save</button>
-        <button class="msketch-drawer-btn" onclick="showDialog(TOOL_OPEN);"><i class="material-icons">folder_open</i>Open</button>
-        <button class="msketch-drawer-btn" onclick="interfaceSelect(TOOL_EXPORT);"><i class="material-icons">file_download</i>Export Plane</button>
-        <button class="msketch-drawer-btn" onclick="showDialog(TOOL_IMPORT);"><i class="material-icons">file_upload</i>Import Plane</button>
-        <button class="msketch-drawer-btn" onclick="interfaceSelect(TOOL_DRAWING);"><i class="material-icons">picture_as_pdf</i>Export Drawing</button>
-        <button class="msketch-drawer-btn" onclick="location.href='logout';"><i class="material-icons">cloud_off</i>Logout</button>
-        <button class="msketch-drawer-btn" onclick="$('#msketch_about').show();"><i class="material-icons">info_outline</i>About</button>
+        <ul class="msketch-menu">
+            <li class="msketch-menu-item has-sub">File
+                <ul class="msketch-menu-sub">
+                    <li class="msketch-menu-item" onclick="showDialog(TOOL_NEWFILE);">New</li>
+                    <li class="msketch-menu-item" onclick="showDialog(TOOL_SAVE);">Save</li>
+                    <li class="msketch-menu-item" onclick="showDialog(TOOL_OPEN);">Open</li>
+                    <li class="msketch-menu-item has-sub">Export
+                        <ul class="msketch-menu-sub">
+                            <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_DRAWING);">Drawing</li>
+                            <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_EXPORT);">Plane</li>
+                            <li class="msketch-menu-item" onclick="$('#panel_fab_downloadLink').click();">3D Link</li>
+                            <li class="msketch-menu-item" onclick="$('#panel_fab_downloadGear').click();">Gear</li>
+                        </ul>
+                    </li>
+                    <li class="msketch-menu-item has-sub">Import
+                        <ul class="msketch-menu-sub">
+                            <li class="msketch-menu-item" onclick="showDialog(TOOL_IMPORT);">Plane</li>
+                        </ul>
+                    </li>
+                    <li class="msketch-menu-divider"></li>
+                    <li class="msketch-menu-item" onclick="location.href='logout';">Logout</li>
+                </ul>
+            </li>
+            <li class="msketch-menu-item has-sub msketch-menu-lock">Draw &amp; Edit
+                <ul class="msketch-menu-sub">
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_LINK);">Add Link</li>
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_JA);">Add Motor</li>
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_SLIDER);">Set Slider</li>
+                    <li class="msketch-menu-item" onclick="$('#btn_panel_gen').click();">Linkage Generation</li>
+                    <li class="msketch-menu-item" onclick="$('#btn_panel_link3d').click();">3D Link Generation</li>
+                    <li class="msketch-menu-item" onclick="$('#btn_panel_gear').click();">Gear Generation</li>
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_REMOVE);">Remove Part</li>
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_SELECT);">Select</li>
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_MOVE);">Edit Link</li>
+                    <li class="msketch-menu-item" onclick="$('#btn_panel_pattern').click();">Pattern Generation</li>
+                    <li class="msketch-menu-divider"></li>
+                    <li class="msketch-menu-item has-sub">Plane
+                        <ul class="msketch-menu-sub">
+                            <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_PADD);">Add Plane</li>
+                            <li class="msketch-menu-item" onclick="showDialog(TOOL_PREMOVE);">Remove Plane</li>
+                            <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_PSEL);">Select Plane</li>
+                            <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_PTRANS);">Plane Translation</li>
+                            <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_PROT);">Plane Rotation</li>
+                            <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_PCOPY);">Copy This Plane</li>
+                        </ul>
+                    </li>
+                    <li class="msketch-menu-divider"></li>
+                    <li class="msketch-menu-item" onclick="undo();">Undo</li>
+                    <li class="msketch-menu-item" onclick="redo();">Redo</li>
+                </ul>
+            </li>
+            <li class="msketch-menu-item has-sub msketch-menu-lock">View
+                <ul class="msketch-menu-sub">
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_MARK);">Toggle Marker</li>
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_NAV);">Toggle View Tumbling</li>
+                    <li class="msketch-menu-item" onclick="interfaceSelect(TOOL_PCAM);">See Plane on Top</li>
+                    <li class="msketch-menu-item" onclick="setViewMode(0);">Schematic View</li>
+                    <li class="msketch-menu-item" onclick="setViewMode(1);">Part View</li>
+                    <li class="msketch-menu-item" onclick="set3DView();">3D View</li>
+                </ul>
+            </li>
+            <li class="msketch-menu-item has-sub">Tools
+                <ul class="msketch-menu-sub">
+                    <li class="msketch-menu-item" onclick="$('#btn_settings').click();">Settings</li>
+                    <li class="msketch-menu-item" onclick="openMotorPanel();">Motor Settings</li>
+                    <li class="msketch-menu-item" onclick="showSettingsPanel('panel_settings_view');">Plane Settings</li>
+                    <li class="msketch-menu-item" onclick="showSettingsPanel('panel_settings_part');">Link Part Settings</li>
+                </ul>
+            </li>
+            <li class="msketch-menu-item has-sub">Info
+                <ul class="msketch-menu-sub">
+                    <li class="msketch-menu-item" onclick="$('#msketch_about').show();">About</li>
+                </ul>
+            </li>
+        </ul>
     </div>
 
     <%- include("panels") -%>
