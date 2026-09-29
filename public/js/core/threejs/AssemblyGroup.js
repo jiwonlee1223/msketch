@@ -68,13 +68,11 @@ function AssemblyGroup(){
 
 }
 
-AssemblyGroup.PLANE_SIZE 				= 1000;
 AssemblyGroup.GRID_GAP					= 100;
 AssemblyGroup.PLANE_COLOR 				= 0x6a3fc4;
 AssemblyGroup.PLANE_OPA 				= 0.2;
 AssemblyGroup.NUM_OF_GRID 				= 50;
-AssemblyGroup.GRID_WIDTH_MM 			= 364;	// B4 landscape
-AssemblyGroup.GRID_HEIGHT_MM 			= 257;
+AssemblyGroup.GRID_EXTENT_MM 			= 2000;	// half size of the grid, large enough to fill the screen
 
 AssemblyGroup.CUBE_SIZE 				= 30;
 AssemblyGroup.CUBE_OPA 					= 0.5;
@@ -150,11 +148,13 @@ AssemblyGroup.prototype.getSelection = function(){
 
 // DRAW COMMON FEATURES
 AssemblyGroup.prototype.drawPlane = function(){
-	var planeGeometry = new THREE.PlaneGeometry( AssemblyGroup.PLANE_SIZE, AssemblyGroup.PLANE_SIZE );
+	// unit square, scaled to msketchSettings.planeWidth x planeHeight (B4 by default)
+	var planeGeometry = new THREE.PlaneGeometry( 1, 1 );
 	var planeMaterial = new THREE.MeshBasicMaterial( { color: AssemblyGroup.PLANE_COLOR, side: THREE.DoubleSide, transparent: true, opacity: AssemblyGroup.PLANE_OPA,  depthWrite: false, depthTest: false } );
 
 	this.group = new THREE.Object3D();
 	this.plane = new THREE.Mesh( planeGeometry, planeMaterial );
+	this.plane.scale.set( msketchSettings.planeWidth/SCALE_TRANS, msketchSettings.planeHeight/SCALE_TRANS, 1 );
 	this.group.add( this.plane );
 
 	planeGeometry = new THREE.PlaneGeometry( 9999, 9999 );
@@ -184,12 +184,12 @@ AssemblyGroup.prototype.drawPlane = function(){
 	this.group.add( this.axis );
 }
 
-// B4-sized grid (GRID_WIDTH_MM x GRID_HEIGHT_MM) centered on the origin, lines every _gapMM.
-// Same look as THREE.GridHelper, but rectangular and with a fixed overall size.
+// Grid spanning +-GRID_EXTENT_MM around the origin, lines every _gapMM.
+// Same look as THREE.GridHelper, but keeps a fixed overall size for any gap.
 AssemblyGroup.prototype.makeGrid = function(_gapMM){
-	var _hw = (AssemblyGroup.GRID_WIDTH_MM/2)/SCALE_TRANS;
-	var _hh = (AssemblyGroup.GRID_HEIGHT_MM/2)/SCALE_TRANS;
 	var _gap = _gapMM/SCALE_TRANS;
+	var _hw = Math.ceil( (AssemblyGroup.GRID_EXTENT_MM/SCALE_TRANS)/_gap )*_gap;
+	var _hh = _hw;
 	var _center = new THREE.Color( 0x444444 ), _line = new THREE.Color( 0x888888 );
 	var positions = [], colors = [];
 
@@ -202,7 +202,7 @@ AssemblyGroup.prototype.makeGrid = function(_gapMM){
 		for(var k=Math.floor(_half/_gap); k>0; k--){
 			if(k*_gap < _half - 1e-6) _list.push(k*_gap);
 		}
-		_list.push(_half);	// closing border
+		_list.push(_half);	// outermost line
 		return _list;
 	}
 
@@ -308,7 +308,7 @@ AssemblyGroup.prototype.hideText = function(){
 
 
 AssemblyGroup.prototype.setSettings = function(_settings){
-	// rebuild instead of scaling so the grid keeps its B4 extent
+	// rebuild instead of scaling so the grid keeps its full-screen extent
 	if(this.mmGrid.gapMM != msketchSettings.gridGap && msketchSettings.gridGap > 0){
 		var _opacity = this.mmGrid.material.opacity;
 		this.group.remove( this.mmGrid );
@@ -326,8 +326,7 @@ AssemblyGroup.prototype.setSettings = function(_settings){
 
 	this.isRemoveText = !msketchSettings.showText;
 
-	var _planeSacle =  ( msketchSettings.planeSize/SCALE_TRANS ) / AssemblyGroup.PLANE_SIZE;
-	this.plane.scale.set( _planeSacle, _planeSacle, 1 );
+	this.plane.scale.set( msketchSettings.planeWidth/SCALE_TRANS, msketchSettings.planeHeight/SCALE_TRANS, 1 );
 }
 
 

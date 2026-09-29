@@ -4,13 +4,22 @@
 var container, camera, scene, renderer, raycaster;
 var canvasWidth, canvasHeight;
 
+// camera distance at which the whole plane (planeWidth x planeHeight) fits in the view, with some margin
+function getFitDistance(){
+	var _margin = 1.2;
+	var _tanHalf = Math.tan( THREE.Math.degToRad( camera.fov/2 ) );
+	var _halfW = (msketchSettings.planeWidth/SCALE_TRANS)/2;
+	var _halfH = (msketchSettings.planeHeight/SCALE_TRANS)/2;
+	return Math.max( _halfH/_tanHalf, _halfW/(_tanHalf*camera.aspect) ) * _margin;
+}
+
 function init(){
 	canvasWidth = $('#threejs_canvas').innerWidth();
 	canvasHeight = $('#threejs_canvas').innerHeight();
 	//scene and camera
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera( 1, canvasWidth/canvasHeight, 10000, 100000000 );
-	camera.position.set( 0, 0, 100000 );
+	camera.position.set( 0, 0, getFitDistance() );
 	scene.add( camera );
 
 	//scene basic setup

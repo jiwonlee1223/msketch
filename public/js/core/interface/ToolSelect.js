@@ -159,9 +159,10 @@ function interfaceSelect(_selected){
 			var rY = currentAssemblyGroup.group.rotation.y;
 			var rZ = currentAssemblyGroup.group.rotation.z;
 
-			camera.position.x = 100000*Math.sin(rY);
-			camera.position.y = 100000*Math.sin(rX)*Math.cos(rY)*(-1);
-			camera.position.z = 100000*Math.cos(rX)*Math.cos(rY);
+			var _dist = getFitDistance();
+			camera.position.x = _dist*Math.sin(rY);
+			camera.position.y = _dist*Math.sin(rX)*Math.cos(rY)*(-1);
+			camera.position.z = _dist*Math.cos(rX)*Math.cos(rY);
 
 			_target = new THREE.Vector3(currentAssemblyGroup.group.position.x,currentAssemblyGroup.group.position.y,currentAssemblyGroup.group.position.z);
 

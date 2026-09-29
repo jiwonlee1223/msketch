@@ -27,11 +27,14 @@
       </label>
     </div>
     <div class="msketch-panel-row">
-      <div class="msketch-panel-label" data-label="Grid Gap (mm)" style="width: 49%;">
+      <div class="msketch-panel-label" data-label="Grid Gap (mm)" style="width: 32%;">
           <input class="form-input msketch-panel-input" type="text" id="setting_gridGap">
       </div>
-      <div class="msketch-panel-label" data-label="Plane Size (mm)" style="width: 49%;">
-          <input class="form-input msketch-panel-input" type="text" id="setting_planeSize">
+      <div class="msketch-panel-label" data-label="Plane W (mm)" style="width: 32%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_planeWidth">
+      </div>
+      <div class="msketch-panel-label" data-label="Plane H (mm)" style="width: 32%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_planeHeight">
       </div>
     </div>
 
@@ -72,7 +75,8 @@
         $('#setting_showPlane').prop('checked', msketchSettings.showPlane);
 
         $('#setting_gridGap').val( msketchSettings.gridGap );
-        $('#setting_planeSize').val( msketchSettings.planeSize );
+        $('#setting_planeWidth').val( msketchSettings.planeWidth );
+        $('#setting_planeHeight').val( msketchSettings.planeHeight );
 
         $('#setting_holeDiameter').val( msketchSettings.holeDiameter );
         $('#setting_linkWidth').val( msketchSettings.linkWidth );
@@ -86,7 +90,9 @@
             url: '/loadSettings',
             method: 'post',
             success: function (data) {
-                msketchSettings = JSON.parse(data.settings);
+                // keep defaults for keys missing from older saved settings (e.g. planeWidth/planeHeight)
+                msketchSettings = $.extend(msketchSettings, JSON.parse(data.settings));
+                delete msketchSettings.planeSize;
 
                 // apply settings
                 MAX_HISTORY = parseInt( msketchSettings.MaxHistorySize );
@@ -109,7 +115,8 @@
         msketchSettings.showPlane = $("#setting_showPlane").prop("checked");
 
         msketchSettings.gridGap = parseFloat( $('#setting_gridGap').val() );
-        msketchSettings.planeSize = parseFloat( $('#setting_planeSize').val() );
+        msketchSettings.planeWidth = parseFloat( $('#setting_planeWidth').val() );
+        msketchSettings.planeHeight = parseFloat( $('#setting_planeHeight').val() );
 
         msketchSettings.holeDiameter = parseFloat( $('#setting_holeDiameter').val() );
         msketchSettings.linkWidth = parseFloat( $('#setting_linkWidth').val() );

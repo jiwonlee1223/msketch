@@ -639,8 +639,8 @@ StackInterface.prototype.mouseMoveAndUp = function(_x, _y){}
 // the visible plane is centered at the origin of the assembly group
 function isOnCurrentPlane(_x, _y){
     if(intersects.length==0) return false;
-    var _half = (msketchSettings.planeSize/SCALE_TRANS)/2;
-    return Math.abs(_x) <= _half && Math.abs(_y) <= _half;
+    return Math.abs(_x) <= (msketchSettings.planeWidth/SCALE_TRANS)/2 &&
+           Math.abs(_y) <= (msketchSettings.planeHeight/SCALE_TRANS)/2;
 }
 
 

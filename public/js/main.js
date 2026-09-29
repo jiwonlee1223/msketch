@@ -66,7 +66,8 @@ msketchSettings.showText = true;
 msketchSettings.showPlane = true;
 
 msketchSettings.gridGap = 10;
-msketchSettings.planeSize = 100;
+msketchSettings.planeWidth = 364;	// B4 landscape
+msketchSettings.planeHeight = 257;
 
 msketchSettings.linkWidth = 12.7; // 0.5inch
 msketchSettings.holeDiameter = 4;
