@@ -14,40 +14,12 @@
         </div>
     </div>
 
-    <div class="msketch-panel-row">
-      <label class="form-switch">
-        <input type="checkbox" id="panel_move_sbGrid">
-        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Grid &amp; Snap</span>
-      </label>
-      <label class="form-switch">
-        <input type="checkbox" id="panel_move_sbSnap">
-        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Unit Conversion</span>
-      </label>
-    </div>
-
     <button class="msketch-panel-btn-large" id="panel_move_apply"><i class="material-icons">done</i>Apply</button>
 </div>
 
 
 <script>
     // === Postion Panel ===
-    $('#panel_move_sbGrid').on('change', function(){
-        if( $("#panel_move_sbGrid").prop("checked") ){
-            isScienceBoxSanpOn = true;
-    		currentAssemblyGroup.showSBGrid();
-        }else{
-            isScienceBoxSanpOn = false;
-    		currentAssemblyGroup.hideSBGrid();
-        }
-    });
-    $('#panel_move_sbSnap').on('change', function(){
-        if( $("#panel_move_sbSnap").prop("checked") ){
-            isScienceBoxLinkOn = true;
-        }else{
-            isScienceBoxLinkOn = false;
-        }
-    });
-
     $('#panel_move_apply').click( function(){
         applyMove();
 		applyLength();

@@ -1,17 +1,6 @@
-<!-- System settings open from the titlebar; View / Part settings open from the Select tool (plane / link) -->
+<!-- System settings open from the titlebar (or the Select tool on a plane); Part settings open from the Select tool on a link -->
 <div class="msketch-panel-container" id="panel_settings" style="display: none">
     <div class="msketch-panel-title">System<br>Settings</div>
-    <div class="msketch-panel-row">
-      <div class="msketch-panel-label" data-label="Max History Size" style="width: 100%;">
-          <input class="form-input msketch-panel-input" type="text" id="setting_maxHistory">
-      </div>
-    </div>
-
-    <button class="msketch-panel-btn-large setting-apply" id="setting_apply"><i class="material-icons">done</i>Apply</button>
-</div>
-
-<div class="msketch-panel-container" id="panel_settings_view" style="display: none">
-    <div class="msketch-panel-title">View<br>Properties</div>
     <div class="msketch-panel-row">
       <label class="form-switch">
         <input type="checkbox" id="setting_showGrid">
@@ -27,6 +16,16 @@
       </label>
     </div>
     <div class="msketch-panel-row">
+      <label class="form-switch">
+        <input type="checkbox" id="setting_sbGrid">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Grid &amp; Snap</span>
+      </label>
+      <label class="form-switch">
+        <input type="checkbox" id="setting_sbSnap">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Unit Conversion</span>
+      </label>
+    </div>
+    <div class="msketch-panel-row">
       <div class="msketch-panel-label" data-label="Grid Gap (mm)" style="width: 32%;">
           <input class="form-input msketch-panel-input" type="text" id="setting_gridGap">
       </div>
@@ -37,8 +36,13 @@
           <input class="form-input msketch-panel-input" type="text" id="setting_planeHeight">
       </div>
     </div>
+    <div class="msketch-panel-row">
+      <div class="msketch-panel-label" data-label="Max History Size" style="width: 100%;">
+          <input class="form-input msketch-panel-input" type="text" id="setting_maxHistory">
+      </div>
+    </div>
 
-    <button class="msketch-panel-btn-large setting-apply"><i class="material-icons">done</i>Apply</button>
+    <button class="msketch-panel-btn-large setting-apply" id="setting_apply"><i class="material-icons">done</i>Apply</button>
 </div>
 
 <div class="msketch-panel-container" id="panel_settings_part" style="display: none">
@@ -67,6 +71,16 @@
 
     $('.setting-apply').click( function(){
         applySettings();
+    });
+
+    // ScienceBox toggles take effect immediately (not saved with the settings)
+    $('#setting_sbGrid').on('change', function(){
+        isScienceBoxSanpOn = $(this).prop("checked");
+        if(isScienceBoxSanpOn)	currentAssemblyGroup.showSBGrid();
+        else 					currentAssemblyGroup.hideSBGrid();
+    });
+    $('#setting_sbSnap').on('change', function(){
+        isScienceBoxLinkOn = $(this).prop("checked");
     });
 
     function loadSettings(){

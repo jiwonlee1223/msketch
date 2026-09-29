@@ -603,7 +603,7 @@ SelectInterface.prototype.mouseDown = function(_x, _y){
     }else if(hoverLink!=null){
       showSettingsPanel('panel_settings_part');
     }else if(isOnCurrentPlane(_x, _y)){
-      showSettingsPanel('panel_settings_view');
+      $('#btn_settings').click();
     }
 }
 
