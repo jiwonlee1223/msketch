@@ -1,8 +1,10 @@
 <!-- System settings open from the titlebar (or the Select tool on a plane); Part settings open from the Select tool on a link,
-     which also becomes the (highlighted) target of "ScienceBox Unit Conversion" -->
+     which becomes the (highlighted) target of "ScienceBox Unit Conversion" and "Stacking Order" -->
 <div class="msketch-panel-container" id="panel_settings" style="display: none">
     <div class="msketch-panel-title">System<br>Settings</div>
-    <div class="msketch-panel-row">
+
+    <div class="msketch-panel-section">Display</div>
+    <div class="msketch-panel-row msketch-panel-switches">
       <label class="form-switch">
         <input type="checkbox" id="setting_showGrid">
         <i class="form-icon"></i> <span class="msketch-panel-desc">Show Grid</span>
@@ -17,12 +19,6 @@
       </label>
     </div>
     <div class="msketch-panel-row">
-      <label class="form-switch">
-        <input type="checkbox" id="setting_sbGrid">
-        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Grid &amp; Snap</span>
-      </label>
-    </div>
-    <div class="msketch-panel-row">
       <div class="msketch-panel-label" data-label="Grid Gap (mm)" style="width: 32%;">
           <input class="form-input msketch-panel-input" type="text" id="setting_gridGap">
       </div>
@@ -33,6 +29,20 @@
           <input class="form-input msketch-panel-input" type="text" id="setting_planeHeight">
       </div>
     </div>
+
+    <div class="msketch-panel-section msketch-panel-section-divided">Snap</div>
+    <div class="msketch-panel-row msketch-panel-switches">
+      <label class="form-switch">
+        <input type="checkbox" id="setting_gridSnap">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">Grid Snap</span>
+      </label>
+      <label class="form-switch">
+        <input type="checkbox" id="setting_sbGrid">
+        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Grid &amp; Snap</span>
+      </label>
+    </div>
+
+    <div class="msketch-panel-section msketch-panel-section-divided">General</div>
     <div class="msketch-panel-row">
       <div class="msketch-panel-label" data-label="Max History Size" style="width: 100%;">
           <input class="form-input msketch-panel-input" type="text" id="setting_maxHistory">
@@ -48,6 +58,11 @@
     <div class="msketch-panel-section">Selected Link</div>
     <div class="msketch-panel-desc" id="setting_sbTarget"></div>
     <button class="msketch-panel-btn-large" id="setting_sbRound">ScienceBox Unit Conversion</button>
+    <div class="msketch-panel-row" style="overflow: hidden;">
+      <div class="msketch-panel-btn-text" id="setting_stackText" style="margin-bottom: 0;">Stacking Order</div>
+      <button class="msketch-panel-btn" id="setting_stackPlus"><i class="material-icons">add_circle_outline</i></button>
+      <button class="msketch-panel-btn" id="setting_stackMinus"><i class="material-icons">remove_circle_outline</i></button>
+    </div>
 
     <div class="msketch-panel-section msketch-panel-section-divided">All Links</div>
     <div class="msketch-panel-row">
@@ -72,6 +87,11 @@
         applySettings();
     });
 
+    // Grid Snap takes effect immediately (and is saved on Apply), like the ScienceBox toggle next to it
+    $('#setting_gridSnap').on('change', function(){
+        msketchSettings.gridSnap = $(this).prop("checked");
+    });
+
     // ScienceBox toggle takes effect immediately (not saved with the settings)
     $('#setting_sbGrid').on('change', function(){
         isScienceBoxSanpOn = $(this).prop("checked");
@@ -79,46 +99,68 @@
         else 					currentAssemblyGroup.hideSBGrid();
     });
 
-    // link picked by the Select tool; its length can be rounded to ScienceBox units (SCIENCEBOX_SNAP)
-    var sbTargetLink = null;
+    // link picked by the Select tool: its length can be rounded to ScienceBox units (SCIENCEBOX_SNAP)
+    // and its stacking order changed
+    var partTargetLink = null;
 
-    function setSBTarget(_link){
-        sbTargetLink = _link;
-        var _usable = sbTargetLink != null && sbTargetLink.getPointList().length() == 2;
-        $('#setting_sbRound').prop('disabled', !_usable);
+    function setPartTarget(_link){
+        partTargetLink = _link;
+        var _twoPoint = partTargetLink != null && partTargetLink.getPointList().length() == 2;
+        $('#setting_sbRound').prop('disabled', !_twoPoint);
+        $('#setting_stackPlus, #setting_stackMinus').prop('disabled', partTargetLink == null);
 
-        if(sbTargetLink == null){
-            $('#setting_sbTarget').text('Select a link to round its length.');
-        }else if(!_usable){
-            $('#setting_sbTarget').text(sbTargetLink.getName() + ' · only two-point links can be rounded');
-        }else{
-            var _length = sbTargetLink.getPointList().get(0).distance( sbTargetLink.getPointList().get(1).getX(), sbTargetLink.getPointList().get(1).getY() );
-            $('#setting_sbTarget').text(sbTargetLink.getName() + ' · ' + (_length*SCALE_TRANS).toFixed(2) + 'mm (SB ' + (_length/SCIENCEBOX_SNAP).toFixed(1) + ')');
-        }
-    }
-    setSBTarget(null);
-
-    $('#setting_sbRound').click( function(){
-        // the link may have been removed or belong to another plane by now
-        if(sbTargetLink == null || currentAssemblyGroup.findObjectFromElement(sbTargetLink) == null){
-            setSBTarget(null);
+        if(partTargetLink == null){
+            $('#setting_sbTarget').text('Select a link with the Select tool.');
+            $('#setting_stackText').text('Stacking Order');
             return;
         }
-        var _p1 = sbTargetLink.getPointList().get(0), _p2 = sbTargetLink.getPointList().get(1);
+        if(!_twoPoint){
+            $('#setting_sbTarget').text(partTargetLink.getName() + ' · only two-point links can be rounded');
+        }else{
+            var _length = partTargetLink.getPointList().get(0).distance( partTargetLink.getPointList().get(1).getX(), partTargetLink.getPointList().get(1).getY() );
+            $('#setting_sbTarget').text(partTargetLink.getName() + ' · ' + (_length*SCALE_TRANS).toFixed(2) + 'mm (SB ' + (_length/SCIENCEBOX_SNAP).toFixed(1) + ')');
+        }
+        $('#setting_stackText').text('Stacking Order · ' + partTargetLink.stack);
+    }
+    setPartTarget(null);
+
+    // the link may have been removed or belong to another plane by now
+    function getPartTargetObject(){
+        var _obj = (partTargetLink == null)? null : currentAssemblyGroup.findObjectFromElement(partTargetLink);
+        if(_obj == null) setPartTarget(null);
+        return _obj;
+    }
+
+    $('#setting_stackPlus').click( function(){ changeStack(1); });
+    $('#setting_stackMinus').click( function(){ changeStack(-1); });
+
+    function changeStack(_delta){
+        var _obj = getPartTargetObject();
+        if(_obj == null) return;
+        partTargetLink.stack += _delta;
+        _obj.updateStack();
+        checkHistory();
+        setPartTarget(partTargetLink);
+    }
+
+    $('#setting_sbRound').click( function(){
+        if(getPartTargetObject() == null) return;
+        var _p1 = partTargetLink.getPointList().get(0), _p2 = partTargetLink.getPointList().get(1);
         var _length = _p1.distance(_p2.getX(), _p2.getY());
         var _newLength = Math.max( 1, Math.round(_length/SCIENCEBOX_SNAP) ) * SCIENCEBOX_SNAP;
 
-        setLengthToLink(sbTargetLink, _p1, _p2, _newLength);
+        setLengthToLink(partTargetLink, _p1, _p2, _newLength);
         currentAssemblyGroup.load();
         try360forAssemblies();
         checkHistory();
-        setSBTarget(sbTargetLink);
+        setPartTarget(partTargetLink);
     });
 
     function loadSettings(){
         $('#setting_showGrid').prop('checked', msketchSettings.showGrid);
         $('#setting_showText').prop('checked', msketchSettings.showText);
         $('#setting_showPlane').prop('checked', msketchSettings.showPlane);
+        $('#setting_gridSnap').prop('checked', msketchSettings.gridSnap);
 
         $('#setting_gridGap').val( msketchSettings.gridGap );
         $('#setting_planeWidth').val( msketchSettings.planeWidth );
@@ -131,7 +173,15 @@
         $('#setting_maxHistory').val( msketchSettings.MaxHistorySize );
     }
 
+    // part settings are in mm; the 3D link uses scene units (mm/SCALE_TRANS)
+    function applyLinkPartSettings(){
+        Link3D.HEIGHT = msketchSettings.linkThickness/SCALE_TRANS;
+        Link3D.EXTRUDE_SET.amount = Link3D.HEIGHT;
+        Link3D.HOLE_SIZE = (msketchSettings.holeDiameter/SCALE_TRANS)/2;
+    }
+
     function initSettings(){
+        applyLinkPartSettings();	// defaults until the saved settings arrive
         $.ajax({
             url: '/loadSettings',
             method: 'post',
@@ -142,6 +192,7 @@
 
                 // apply settings
                 MAX_HISTORY = parseInt( msketchSettings.MaxHistorySize );
+                applyLinkPartSettings();
 
                 for(var i=0; i<AssemblyGroupList.length; i++){
                     AssemblyGroupList[i].setSettings(msketchSettings);
@@ -159,6 +210,7 @@
         msketchSettings.showGrid = $("#setting_showGrid").prop("checked");
         msketchSettings.showText = $("#setting_showText").prop("checked");
         msketchSettings.showPlane = $("#setting_showPlane").prop("checked");
+        msketchSettings.gridSnap = $("#setting_gridSnap").prop("checked");
 
         msketchSettings.gridGap = parseFloat( $('#setting_gridGap').val() );
         msketchSettings.planeWidth = parseFloat( $('#setting_planeWidth').val() );
@@ -169,9 +221,7 @@
         msketchSettings.linkThickness = parseFloat( $('#setting_linkThickness').val() );
 
         //apply setting to 3D link (yw_edited)
-        Link3D.HEIGHT = msketchSettings.linkThickness;
-        Link3D.EXTRUDE_SET.amount = msketchSettings.linkThickness;
-        Link3D.HOLE_SIZE = (msketchSettings.holeDiameter/SCALE_TRANS)/2;
+        applyLinkPartSettings();
 
         msketchSettings.MaxHistorySize = parseInt( $('#setting_maxHistory').val() );
 

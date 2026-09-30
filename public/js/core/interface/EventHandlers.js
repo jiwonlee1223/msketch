@@ -133,6 +133,7 @@ function onDocumentMouseUp( event ) {
 	if(toolState==TOOL_PSEL){
 		if(getTargetPlane()!=-1){
 			selectAssembly(getTargetPlane());
+			getPlaneInfoToPlanePanel();
 		}
 	}
 

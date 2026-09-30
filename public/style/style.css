@@ -393,8 +393,16 @@ hr{
 .msketch-panel-section-divided{
     border-top: 1px solid #444;
     padding-top: 24px;
+    margin-top: 12px;
+}
+/* labeled inputs right under a section heading need room for their floating label */
+.msketch-panel-section + .msketch-panel-row .msketch-panel-label{
     margin-top: 24px;
-    margin-bottom: 24px;
+}
+/* one switch per line */
+.msketch-panel-switches .form-switch{
+    display: block;
+    margin: 0 0 4px;
 }
 #setting_sbTarget{
     color: #fff;
@@ -491,6 +499,10 @@ hr{
     background-color: #4bb7ba;
 }
 
+.msketch-panel-btn:disabled{
+    opacity: 0.2;
+    cursor: default;
+}
 .msketch-panel-btn-text{
     display: inline-block;
     line-height: 36px;

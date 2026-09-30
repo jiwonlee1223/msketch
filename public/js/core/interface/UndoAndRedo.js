@@ -30,6 +30,7 @@ function undo(){
 	try360forAssemblies();
 
 	selectAssembly(_tempIndex);
+	getPlaneInfoToPlanePanel();	// keep the plane panel in sync with the restored plane
 }
 
 function redo(){
@@ -44,4 +45,5 @@ function redo(){
 	try360forAssemblies();
 
 	selectAssembly(_tempIndex);
+	getPlaneInfoToPlanePanel();	// keep the plane panel in sync with the restored plane
 }

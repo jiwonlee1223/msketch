@@ -64,6 +64,7 @@ viewMode = 0;
 msketchSettings.showGrid = true;
 msketchSettings.showText = true;
 msketchSettings.showPlane = true;
+msketchSettings.gridSnap = false;	// snap dragged points to the grid (gridGap)
 
 msketchSettings.gridGap = 10;
 msketchSettings.planeWidth = 364;	// B4 landscape

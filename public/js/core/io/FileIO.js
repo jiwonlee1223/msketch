@@ -68,7 +68,8 @@ function loadMsketchInfoForPlane(_sketch, _isNew){
 	for(var j=0; j<_sketch.links.length; j++){
 		var _link = _sketch.links[j];
 		var _linkElement = new Link(_link.name + nameTag, parseFloat(_link.points[0].x)/SCALE_TRANS, parseFloat(_link.points[0].y)/SCALE_TRANS )
-		_linkElement.stack = _link.points[0].z/Link3D.HEIGHT; //yw_edited
+		// older files only have z, which is only valid if the thickness hasn't changed since
+		_linkElement.stack = (_link.stack != null)? _link.stack : _link.points[0].z/Link3D.HEIGHT; //yw_edited
 		currentAssembly.addElement(_linkElement);
 
 		currentAssemblyGroup.load();
@@ -274,6 +275,7 @@ function getMsketchInfo(){
 			else if(e instanceof Link){
 				var tempLink = {};
 				tempLink.name = e.name;
+				tempLink.stack = e.stack;	// z below depends on the link thickness at save time
 				tempLink.points = [];
 
 				for(var pi in e.getPointList().array){

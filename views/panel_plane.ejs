@@ -41,16 +41,20 @@
         }
     });
 
+    // refresh the fields after a flip, otherwise the next Apply would undo it
     $('#panel_plane_flipHor').click( function(){
         planeData = currentAssemblyGroup.getPositionData();
         planeData.ry = planeData.ry + Math.PI;
         currentAssemblyGroup.setPositionData(planeData);
+        getPlaneInfoToPlanePanel();
+        checkHistory();
     });
     $('#panel_plane_flipVert').click( function(){
         planeData = currentAssemblyGroup.getPositionData();
         planeData.rx = planeData.rx + Math.PI;
         currentAssemblyGroup.setPositionData(planeData);
-
+        getPlaneInfoToPlanePanel();
+        checkHistory();
     });
 
     function getPlaneInfoToPlanePanel(){
@@ -75,6 +79,7 @@
     	tempData.ry = Math.radians(parseFloat($('#panel_plane_ry').val()));
     	tempData.rz = Math.radians(parseFloat($('#panel_plane_rz').val()));
     	currentAssemblyGroup.setPositionData(tempData);
+        checkHistory();
     }
 
 </script>

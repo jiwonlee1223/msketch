@@ -17,6 +17,16 @@ var selectedPointPair = null;
 
 var DISTANCE_SNAP = 24;
 
+// snap a position to the active grid; ScienceBox snap wins over the user grid snap (their gaps can differ)
+function getSnappedPoint(_x, _y){
+    var _snap = 0;
+    if(isScienceBoxSanpOn)                                           _snap = SCIENCEBOX_SNAP;
+    else if(msketchSettings.gridSnap && msketchSettings.gridGap > 0) _snap = msketchSettings.gridGap/SCALE_TRANS;
+
+    if(_snap <= 0) return new Point2D(_x, _y);
+    return new Point2D( Math.round(_x/_snap)*_snap, Math.round(_y/_snap)*_snap );
+}
+
 //--------------------
 // Link Class
 //--------------------
@@ -41,7 +51,7 @@ LinkInterface.prototype.mouseMove = function(_x, _y){
 
 LinkInterface.prototype.mouseDown = function(_x, _y){
     if ( hoverPoint==null && hoverLink==null ) { // new space
-      var newPt = new Point2D(_x, _y);
+      var newPt = getSnappedPoint(_x, _y);
       currentSpace.addGlobalPoint(newPt);
 
       this.associatedPoint = newPt;
@@ -67,7 +77,7 @@ LinkInterface.prototype.mouseDownAndMoveFirst = function(_x, _y){
     currentAssembly.appendCoaxialConstraint(this.activeLink, this.activeLink.getPointList().get(0), this.associatedLink, this.associatedPoint);
   }
   if (this.activeLink!=null) {
-    this.activePoint = new Point2D(_x, _y);
+    this.activePoint = getSnappedPoint(_x, _y);
     this.activeLink.addGlobalPoint(this.activePoint);
   }
   currentAssemblyGroup.load();
@@ -78,7 +88,7 @@ LinkInterface.prototype.mouseDownAndMove = function(_x, _y){
   if (this.activeLink!=null && this.activePoint!=null) {
       hoverPoint = getPointByPosition(_x, _y, this.activePoint);
       if(hoverPoint==null){
-        this.activePoint.setLocation(this.activeLink.getLocalPosition(new Point2D(_x, _y)));
+        this.activePoint.setLocation(this.activeLink.getLocalPosition(getSnappedPoint(_x, _y)));
         this.activeLink.redefineVertex();
       }else{
         var position = currentAssembly.getBelongedLink(hoverPoint).getGlobalPosition(hoverPoint);
@@ -92,7 +102,7 @@ LinkInterface.prototype.mouseDownAndMove = function(_x, _y){
 
 LinkInterface.prototype.mouseDownAndUp = function(_x, _y){
     if(this.activeLink!=null){
-      this.activePoint = new Point2D(_x, _y);
+      this.activePoint = getSnappedPoint(_x, _y);
       this.activeLink.addGlobalPoint(this.activePoint);
     }
     currentAssemblyGroup.load();
@@ -331,15 +341,8 @@ MoveInterface.prototype.mouseDownAndMoveFirst = function(_x, _y){
 }
 
 MoveInterface.prototype.mouseDownAndMove = function(_x, _y){
-    var tX, tY;
-    if(isScienceBoxSanpOn){
-      tX = (_x%SCIENCEBOX_SNAP<SCIENCEBOX_SNAP/2)? _x - (_x%SCIENCEBOX_SNAP) : _x + (SCIENCEBOX_SNAP-_x%SCIENCEBOX_SNAP);
-      tY = (_y%SCIENCEBOX_SNAP<SCIENCEBOX_SNAP/2)? _y - (_y%SCIENCEBOX_SNAP) : _y + (SCIENCEBOX_SNAP-_y%SCIENCEBOX_SNAP);
-    }
-    else{
-      tX = _x;
-      tY = _y;
-    }
+    var _snapped = getSnappedPoint(_x, _y);
+    var tX = _snapped.getX(), tY = _snapped.getY();
 
     currentAssemblyGroup.updateSegmentHover(new Float32Array(6));
     currentAssemblyGroup.removeSegmentSelected();
@@ -602,7 +605,7 @@ SelectInterface.prototype.mouseDown = function(_x, _y){
       showMotorPanel(hoverActuator);
     }else if(hoverLink!=null){
       showSettingsPanel('panel_settings_part');	// clears the previous target
-      setSBTarget(hoverLink);
+      setPartTarget(hoverLink);
     }else if(isOnCurrentPlane(_x, _y)){
       $('#btn_settings').click();
     }
@@ -613,29 +616,6 @@ SelectInterface.prototype.mouseDownAndMove = function(_x, _y){}
 SelectInterface.prototype.mouseDownAndUp = function(_x, _y){}
 SelectInterface.prototype.mouseMoveAndUp = function(_x, _y){}
 
-
-//--------------------
-// Stack Class
-//--------------------
-// Active while the Link Stacking panel is open: picks the link to restack
-function StackInterface(){
-}
-
-StackInterface.prototype.mouseMove = function(_x, _y){
-    hoverLink = getLinkUnderMouse(_x, _y);
-}
-
-StackInterface.prototype.mouseDown = function(_x, _y){
-    if(hoverLink!=null){
-      setStackTarget(hoverLink);
-      showMessage(hoverLink.getName() + " selected");
-    }
-}
-
-StackInterface.prototype.mouseDownAndMoveFirst = function(_x, _y){}
-StackInterface.prototype.mouseDownAndMove = function(_x, _y){}
-StackInterface.prototype.mouseDownAndUp = function(_x, _y){}
-StackInterface.prototype.mouseMoveAndUp = function(_x, _y){}
 
 // the visible plane is centered at the origin of the assembly group
 function isOnCurrentPlane(_x, _y){

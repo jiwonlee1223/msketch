@@ -150,11 +150,6 @@ function interfaceSelect(_selected){
 			else if(toolState==TOOL_SELECT) toolState = -1;
 			setTool(toolState);
 			break;
-		case TOOL_STACK:
-			if(toolState!=TOOL_STACK) toolState = TOOL_STACK;
-			else if(toolState==TOOL_STACK) toolState = -1;
-			setTool(toolState);
-			break;
 
 		case TOOL_PCAM:
 			var rX = currentAssemblyGroup.group.rotation.x;
@@ -185,6 +180,7 @@ function interfaceSelect(_selected){
 			if(toolState!=TOOL_PSEL) toolState = TOOL_PSEL;
 			else if(toolState==TOOL_PSEL) toolState = -1;
 			setTool(toolState);
+			if(toolState==TOOL_PSEL) openPlanePanel();
 			break;
 		case TOOL_PTRANS:
 			if(toolState!=TOOL_PTRANS) toolState = TOOL_PTRANS;
@@ -343,10 +339,6 @@ function setTool(_tool){
 			currentInterface = new SelectInterface();
 			_allowNav = false;
 			break;
-		case TOOL_STACK:
-			currentInterface = new StackInterface();
-			_allowNav = false;
-			break;
 		case TOOL_PTRANS:
 			transformControl.attach( currentAssemblyGroup.group );
 			transformControl.setMode( "translate" );
@@ -428,6 +420,9 @@ $('#msketch_drawer').on('click', '.msketch-menu-item:not(.has-sub)', function(){
 
 
 function checkToolSet() {
+	// the plane panel belongs to the Select Plane tool: close it when that tool is turned off or replaced
+	if(toolState != TOOL_PSEL) closePlanePanel();
+
 	if(isPlaying)		$('#btn_play').addClass('active');
 	else 				$('#btn_play').removeClass('active');
 	$('#btn_play i').text( isPlaying ? 'stop' : 'play_arrow' );
