@@ -616,7 +616,7 @@ SelectInterface.prototype.mouseMoveAndUp = function(_x, _y){}
 //--------------------
 // Stack Class
 //--------------------
-// Active while the 3D Link Generation panel is open: picks the link to restack
+// Active while the Link Stacking panel is open: picks the link to restack
 function StackInterface(){
 }
 

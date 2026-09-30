@@ -7,6 +7,6 @@
 	"planeHeight": 257,
 	"linkWidth": 8,
 	"holeDiameter": 4,
-	"linkThickness": 12,
+	"linkThickness": 120,
 	"MaxHistorySize": 20
 }
