@@ -602,12 +602,13 @@ AssemblyGroup.prototype.updateElements = function(){
 			if(obj instanceof Link3D){
 				obj.setVertices( vertices, vertices3D );
 
-				// the stacking target keeps its color even while hovered, in 2D and 3D
-				if(e == stackTargetLink)								obj.setColor(SELECTED_COLOR);
+				// the stacking / ScienceBox target keeps its color even while hovered, in 2D and 3D
+				var _isTarget = (e == stackTargetLink || e == sbTargetLink);
+				if(_isTarget)											obj.setColor(SELECTED_COLOR);
 				else if(e == hoverLink)									obj.setColor(HOVER_COLOR);
 	 			else if(this.assembly.getUnspecified().contains(e))		obj.setColor(ERROR_COLOR);
 	 			else	 												obj.setColor(NORMAL_COLOR);
-				obj.set3DHighlight(e == stackTargetLink);
+				obj.set3DHighlight(_isTarget);
 			}
 
 			if(!this.isRemoveText && !e.isSlider){

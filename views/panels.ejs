@@ -94,6 +94,7 @@
         // leaving the Link Stacking panel ends link picking for stacking
         if(toolState==TOOL_STACK) interfaceSelect(TOOL_STACK);
         setStackTarget(null);
+        setSBTarget(null);
 
         $('.msketch-panel-open').removeClass('active');
         $('#msketch_panel').children().hide();

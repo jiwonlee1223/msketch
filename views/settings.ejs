@@ -1,4 +1,5 @@
-<!-- System settings open from the titlebar (or the Select tool on a plane); Part settings open from the Select tool on a link -->
+<!-- System settings open from the titlebar (or the Select tool on a plane); Part settings open from the Select tool on a link,
+     which also becomes the (highlighted) target of "ScienceBox Unit Conversion" -->
 <div class="msketch-panel-container" id="panel_settings" style="display: none">
     <div class="msketch-panel-title">System<br>Settings</div>
     <div class="msketch-panel-row">
@@ -19,10 +20,6 @@
       <label class="form-switch">
         <input type="checkbox" id="setting_sbGrid">
         <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Grid &amp; Snap</span>
-      </label>
-      <label class="form-switch">
-        <input type="checkbox" id="setting_sbSnap">
-        <i class="form-icon"></i> <span class="msketch-panel-desc">ScienceBox Unit Conversion</span>
       </label>
     </div>
     <div class="msketch-panel-row">
@@ -47,9 +44,12 @@
 
 <div class="msketch-panel-container" id="panel_settings_part" style="display: none">
     <div class="msketch-panel-title">Part<br>Properties</div>
-    <div class="msketch-panel-row">
-        <div class="msketch-panel-desc">Applies to all links.</div>
-    </div>
+
+    <div class="msketch-panel-section">Selected Link</div>
+    <div class="msketch-panel-desc" id="setting_sbTarget"></div>
+    <button class="msketch-panel-btn-large" id="setting_sbRound">ScienceBox Unit Conversion</button>
+
+    <div class="msketch-panel-section msketch-panel-section-divided">All Links</div>
     <div class="msketch-panel-row">
       <div class="msketch-panel-label" data-label="Hole Dia. (mm)" style="width: 100%;">
           <input class="form-input msketch-panel-input" type="text" id="setting_holeDiameter">
@@ -63,7 +63,6 @@
           <input class="form-input msketch-panel-input" type="text" id="setting_linkThickness">
       </div>
     </div>
-
     <button class="msketch-panel-btn-large setting-apply"><i class="material-icons">done</i>Apply</button>
 </div>
 
@@ -73,14 +72,47 @@
         applySettings();
     });
 
-    // ScienceBox toggles take effect immediately (not saved with the settings)
+    // ScienceBox toggle takes effect immediately (not saved with the settings)
     $('#setting_sbGrid').on('change', function(){
         isScienceBoxSanpOn = $(this).prop("checked");
         if(isScienceBoxSanpOn)	currentAssemblyGroup.showSBGrid();
         else 					currentAssemblyGroup.hideSBGrid();
     });
-    $('#setting_sbSnap').on('change', function(){
-        isScienceBoxLinkOn = $(this).prop("checked");
+
+    // link picked by the Select tool; its length can be rounded to ScienceBox units (SCIENCEBOX_SNAP)
+    var sbTargetLink = null;
+
+    function setSBTarget(_link){
+        sbTargetLink = _link;
+        var _usable = sbTargetLink != null && sbTargetLink.getPointList().length() == 2;
+        $('#setting_sbRound').prop('disabled', !_usable);
+
+        if(sbTargetLink == null){
+            $('#setting_sbTarget').text('Select a link to round its length.');
+        }else if(!_usable){
+            $('#setting_sbTarget').text(sbTargetLink.getName() + ' · only two-point links can be rounded');
+        }else{
+            var _length = sbTargetLink.getPointList().get(0).distance( sbTargetLink.getPointList().get(1).getX(), sbTargetLink.getPointList().get(1).getY() );
+            $('#setting_sbTarget').text(sbTargetLink.getName() + ' · ' + (_length*SCALE_TRANS).toFixed(2) + 'mm (SB ' + (_length/SCIENCEBOX_SNAP).toFixed(1) + ')');
+        }
+    }
+    setSBTarget(null);
+
+    $('#setting_sbRound').click( function(){
+        // the link may have been removed or belong to another plane by now
+        if(sbTargetLink == null || currentAssemblyGroup.findObjectFromElement(sbTargetLink) == null){
+            setSBTarget(null);
+            return;
+        }
+        var _p1 = sbTargetLink.getPointList().get(0), _p2 = sbTargetLink.getPointList().get(1);
+        var _length = _p1.distance(_p2.getX(), _p2.getY());
+        var _newLength = Math.max( 1, Math.round(_length/SCIENCEBOX_SNAP) ) * SCIENCEBOX_SNAP;
+
+        setLengthToLink(sbTargetLink, _p1, _p2, _newLength);
+        currentAssemblyGroup.load();
+        try360forAssemblies();
+        checkHistory();
+        setSBTarget(sbTargetLink);
     });
 
     function loadSettings(){

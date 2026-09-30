@@ -601,7 +601,8 @@ SelectInterface.prototype.mouseDown = function(_x, _y){
     if(hoverActuator!=null){
       showMotorPanel(hoverActuator);
     }else if(hoverLink!=null){
-      showSettingsPanel('panel_settings_part');
+      showSettingsPanel('panel_settings_part');	// clears the previous target
+      setSBTarget(hoverLink);
     }else if(isOnCurrentPlane(_x, _y)){
       $('#btn_settings').click();
     }

@@ -78,7 +78,9 @@ function interfaceSelect(_selected){
 					AssemblyGroupList[i].setOpacity(1);
 				}
 
-				currentAssemblyGroup.hidePlane();
+				// keep the purple plane visible while running; only the grid and length text go away
+				currentAssemblyGroup.hideGrid();
+				currentAssemblyGroup.hideText();
 				currentAssemblyGroup.setOpacity(1);
 			}
 			else{
@@ -428,8 +430,8 @@ $('#msketch_drawer').on('click', '.msketch-menu-item:not(.has-sub)', function(){
 function checkToolSet() {
 	if(isPlaying)		$('#btn_play').addClass('active');
 	else 				$('#btn_play').removeClass('active');
-	$('#btn_play i').text( isPlaying ? 'pause' : 'play_arrow' );
-	$('#btn_play').attr('data-tooltip', isPlaying ? 'Pause' : 'Run');
+	$('#btn_play i').text( isPlaying ? 'stop' : 'play_arrow' );
+	$('#btn_play').attr('data-tooltip', isPlaying ? 'Stop' : 'Run');
 
 	if(isControlable)	$('#btn_nav').addClass('active');
 	else 				$('#btn_nav').removeClass('active');
